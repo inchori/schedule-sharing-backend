@@ -38,8 +38,8 @@ public class MyScheduleController {
         return ResponseEntity.ok(myScheduleService.getMySchedule(id, authentication.getName()));
     }
 
-    @GetMapping("/list")
-    public ResponseEntity getMyScheduleList(@RequestBody @Valid YearMonthRequest yearMonthRequest, Authentication authentication) {
+    @GetMapping("/yearMonth")
+    public ResponseEntity getMyScheduleList(@RequestParam YearMonthRequest yearMonthRequest, Authentication authentication) {
         return ResponseEntity.ok(myScheduleService.getMyScheduleList(yearMonthRequest, authentication.getName()));
     }
 

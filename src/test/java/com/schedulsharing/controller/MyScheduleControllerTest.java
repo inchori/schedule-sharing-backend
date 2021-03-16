@@ -20,9 +20,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.Arrays;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
@@ -215,7 +218,11 @@ public class MyScheduleControllerTest extends ApiDocumentationTest{
                 .yearMonth(YearMonth.of(2021, 3))
                 .build();
 
-        mvc.perform(RestDocumentationRequestBuilders.get("/api/myschedule/list")
+        String yearMonth = "2021-03";
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("yearMonth", Arrays.asList(yearMonth));
+        mvc.perform(RestDocumentationRequestBuilders.get("/api/myschedule/yearMonth")
+                .params(params)
                 .header(HttpHeaders.AUTHORIZATION, getBearToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(myYearMonthRequest)))
