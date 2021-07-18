@@ -1,18 +1,19 @@
 package com.schedulsharing.service;
 
+import com.schedulsharing.domain.club.repository.ClubRepository;
+import com.schedulsharing.domain.member.Member;
+import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.domain.schedule.ScheduleSuggestion;
+import com.schedulsharing.domain.schedule.repository.suggestion.ScheduleSuggestionRepository;
+import com.schedulsharing.excpetion.PermissionException;
+import com.schedulsharing.excpetion.scheduleSuggestion.DuplicateVoteCheckException;
+import com.schedulsharing.service.club.ClubService;
 import com.schedulsharing.service.member.MemberService;
 import com.schedulsharing.web.club.dto.ClubCreateRequest;
 import com.schedulsharing.web.club.dto.ClubCreateResponse;
 import com.schedulsharing.web.club.dto.ClubInviteRequest;
 import com.schedulsharing.web.member.dto.SignUpRequestDto;
 import com.schedulsharing.web.member.dto.SignUpResponseDto;
-import com.schedulsharing.domain.member.Member;
-import com.schedulsharing.domain.schedule.ScheduleSuggestion;
-import com.schedulsharing.excpetion.common.InvalidGrantException;
-import com.schedulsharing.excpetion.scheduleSuggestion.DuplicateVoteCheckException;
-import com.schedulsharing.domain.club.repository.ClubRepository;
-import com.schedulsharing.domain.member.repository.MemberRepository;
-import com.schedulsharing.domain.schedule.repository.suggestion.ScheduleSuggestionRepository;
 import com.schedulsharing.web.schedule.club.dto.suggestion.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -383,7 +384,7 @@ class ScheduleSuggestionServiceTest {
         SuggestionVoteRequest suggestionVoteRequest = SuggestionVoteRequest.builder()
                 .agree(true)
                 .build();
-        assertThrows(InvalidGrantException.class,
+        assertThrows(PermissionException.class,
                 () -> scheduleSuggestionService.vote(createResponse.getId(), suggestionVoteRequest, "test2@example.com"));
     }
 

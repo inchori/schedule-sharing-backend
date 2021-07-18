@@ -4,7 +4,7 @@ import com.schedulsharing.web.schedule.club.dto.ClubScheduleCreateRequest;
 import com.schedulsharing.web.schedule.club.dto.ClubScheduleCreateResponse;
 import com.schedulsharing.web.schedule.club.dto.ClubScheduleUpdateRequest;
 import com.schedulsharing.web.dto.resource.ClubScheduleResource;
-import com.schedulsharing.service.ClubScheduleService;
+import com.schedulsharing.service.schedule.ClubScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.EntityModel;

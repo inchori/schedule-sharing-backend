@@ -1,16 +1,16 @@
-package com.schedulsharing.service;
+package com.schedulsharing.service.schedule;
 
-import com.schedulsharing.web.dto.resource.ClubScheduleResource;
 import com.schedulsharing.domain.club.Club;
-import com.schedulsharing.domain.member.Member;
-import com.schedulsharing.domain.schedule.ClubSchedule;
-import com.schedulsharing.excpetion.club.ClubNotFoundException;
-import com.schedulsharing.excpetion.clubSchedule.ClubScheduleNotFoundException;
-import com.schedulsharing.excpetion.common.InvalidGrantException;
-import com.schedulsharing.service.member.exception.MemberNotFoundException;
 import com.schedulsharing.domain.club.repository.ClubRepository;
+import com.schedulsharing.domain.member.Member;
 import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.domain.schedule.ClubSchedule;
 import com.schedulsharing.domain.schedule.repository.clubSchedule.ClubScheduleRepository;
+import com.schedulsharing.excpetion.PermissionException;
+import com.schedulsharing.service.club.exception.ClubNotFoundException;
+import com.schedulsharing.service.member.exception.MemberNotFoundException;
+import com.schedulsharing.service.schedule.exception.ClubScheduleNotFoundException;
+import com.schedulsharing.web.dto.resource.ClubScheduleResource;
 import com.schedulsharing.web.schedule.club.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +69,7 @@ public class ClubScheduleService {
         Member member = findMemberByEmail(email);
         ClubSchedule clubSchedule = clubScheduleFindById(id);
         if (!member.equals(clubSchedule.getMember())) {
-            throw new InvalidGrantException("수정할 권한이 없습니다.");
+            throw new PermissionException();
         }
         clubSchedule.update(clubScheduleUpdateRequest);
         ClubScheduleUpdateResponse response = modelMapper.map(clubSchedule, ClubScheduleUpdateResponse.class);
@@ -80,7 +80,7 @@ public class ClubScheduleService {
         Member member = findMemberByEmail(email);
         ClubSchedule clubSchedule = clubScheduleFindById(id);
         if (!member.equals(clubSchedule.getMember())) {
-            throw new InvalidGrantException("삭제할 권한이 없습니다.");
+            throw new PermissionException();
         }
         clubScheduleRepository.deleteById(id);
         ClubScheduleDeleteResponse clubScheduleDeleteResponse = ClubScheduleDeleteResponse.builder()
@@ -102,7 +102,7 @@ public class ClubScheduleService {
     private ClubSchedule clubScheduleFindById(Long id) {
         Optional<ClubSchedule> optionalClubSchedule = clubScheduleRepository.findById(id);
         if (optionalClubSchedule.isEmpty()) {
-            throw new ClubScheduleNotFoundException("클럽 스케줄이 존재하지 않습니다.");
+            throw new ClubScheduleNotFoundException();
         }
         return optionalClubSchedule.get();
     }
@@ -110,7 +110,7 @@ public class ClubScheduleService {
     private Club findById(Long clubId) {
         Optional<Club> optionalClub = clubRepository.findById(clubId);
         if (optionalClub.isEmpty()) {
-            throw new ClubNotFoundException("클럽이 존재하지 않습니다.");
+            throw new ClubNotFoundException();
         }
         return optionalClub.get();
     }

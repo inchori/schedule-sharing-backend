@@ -1,14 +1,14 @@
 package com.schedulsharing.service.member;
 
 
-import com.schedulsharing.web.dto.resource.MemberResource;
 import com.schedulsharing.domain.club.Club;
+import com.schedulsharing.domain.club.repository.ClubRepository;
 import com.schedulsharing.domain.member.Member;
-import com.schedulsharing.excpetion.common.InvalidGrantException;
+import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.excpetion.PermissionException;
 import com.schedulsharing.service.member.exception.EmailExistedException;
 import com.schedulsharing.service.member.exception.MemberNotFoundException;
-import com.schedulsharing.domain.club.repository.ClubRepository;
-import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.web.dto.resource.MemberResource;
 import com.schedulsharing.web.member.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -85,7 +85,7 @@ public class MemberService {
     public EntityModel<MemberUpdateResponse> updateMember(Long id, MemberUpdateRequest memberUpdateRequest, String email) {
         Member member = findMemberByEmail(email);
         if (!member.getId().equals(id)) {
-            throw new InvalidGrantException("권한이 없습니다.");
+            throw new PermissionException();
         }
         member.update(memberUpdateRequest, passwordEncoder);
         MemberUpdateResponse memberUpdateResponse = modelMapper.map(member, MemberUpdateResponse.class);
@@ -95,7 +95,7 @@ public class MemberService {
     public EntityModel<MemberDeleteResponse> deleteMember(Long id, String email) {
         Member member = findMemberByEmail(email);
         if (!member.getId().equals(id)) {
-            throw new InvalidGrantException("권한이 없습니다.");
+            throw new PermissionException();
         }
         memberRepository.deleteById(id);
         MemberDeleteResponse memberDeleteResponse = MemberDeleteResponse.builder()

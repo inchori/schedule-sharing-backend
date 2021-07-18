@@ -1,16 +1,15 @@
-package com.schedulsharing.service;
+package com.schedulsharing.service.club;
 
-import com.schedulsharing.web.club.dto.*;
-import com.schedulsharing.web.dto.resource.ClubResource;
 import com.schedulsharing.domain.club.Club;
 import com.schedulsharing.domain.club.MemberClub;
-import com.schedulsharing.domain.member.Member;
-import com.schedulsharing.excpetion.club.ClubNotFoundException;
-import com.schedulsharing.excpetion.club.InvalidInviteGrantException;
-import com.schedulsharing.excpetion.common.InvalidGrantException;
-import com.schedulsharing.service.member.exception.MemberNotFoundException;
 import com.schedulsharing.domain.club.repository.ClubRepository;
+import com.schedulsharing.domain.member.Member;
 import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.excpetion.PermissionException;
+import com.schedulsharing.service.club.exception.ClubNotFoundException;
+import com.schedulsharing.service.member.exception.MemberNotFoundException;
+import com.schedulsharing.web.club.dto.*;
+import com.schedulsharing.web.dto.resource.ClubResource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -21,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +58,7 @@ public class ClubService {
         Club club = findById(clubId);
 
         if (!member.getId().equals(club.getLeaderId())) {
-            throw new InvalidInviteGrantException("권한이 없습니다.");
+            throw new PermissionException();
         }
         List<Long> memberIds = clubInviteRequest.getMemberIds();
         List<Member> members = new ArrayList<>();
@@ -81,7 +78,7 @@ public class ClubService {
         Member member = findMemberByEmail(email);
         Club club = findById(clubId);
         if (!member.getId().equals(club.getLeaderId())) {
-            throw new InvalidInviteGrantException("권한이 없습니다.");
+            throw new PermissionException();
         }
         club.update(clubUpdateRequest.getClubName(), clubUpdateRequest.getCategories());
 
@@ -94,7 +91,7 @@ public class ClubService {
         Member member = findMemberByEmail(email);
         Club club = findById(clubId);
         if (!member.getId().equals(club.getLeaderId())) {
-            throw new InvalidGrantException("권한이 없습니다.");
+            throw new PermissionException();
         }
         clubRepository.deleteById(clubId);
         ClubDeleteResponse clubDeleteResponse = new ClubDeleteResponse(true, "모임을 삭제하였습니다");
@@ -121,7 +118,7 @@ public class ClubService {
     private Club findById(Long clubId) {
         Optional<Club> optionalClub = clubRepository.findById(clubId);
         if (optionalClub.isEmpty()) {
-            throw new ClubNotFoundException("클럽이 존재하지 않습니다.");
+            throw new ClubNotFoundException();
         }
         return optionalClub.get();
     }

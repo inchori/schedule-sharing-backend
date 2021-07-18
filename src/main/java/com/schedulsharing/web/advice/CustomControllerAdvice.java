@@ -12,8 +12,7 @@ public class CustomControllerAdvice {
     public ResponseEntity<ApiError> businessExceptionHandler(BusinessException ex) {
         ApiError apiError = ApiError.builder()
                 .httpStatus(HttpStatus.BAD_REQUEST)
-                //TODO error의 원인이 되는 class를 error에 담아주면 좋을 것 같다.
-                .error("BadRequest")
+                .error(ex.getClass().getSimpleName())
                 .message(ex.getMessage())
                 .build();
 

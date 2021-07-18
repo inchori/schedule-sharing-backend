@@ -1,7 +1,7 @@
 package com.schedulsharing.web.vote;
 
 import com.schedulsharing.web.vote.dto.SuggestionVoteUpdateRequest;
-import com.schedulsharing.service.VoteService;
+import com.schedulsharing.service.vote.VoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

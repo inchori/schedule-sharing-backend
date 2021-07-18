@@ -5,7 +5,7 @@ import com.schedulsharing.domain.member.repository.MemberRepository;
 import com.schedulsharing.web.club.dto.ClubCreateRequest;
 import com.schedulsharing.web.member.dto.SignUpRequestDto;
 import com.schedulsharing.domain.club.Club;
-import com.schedulsharing.service.ClubService;
+import com.schedulsharing.service.club.ClubService;
 import com.schedulsharing.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

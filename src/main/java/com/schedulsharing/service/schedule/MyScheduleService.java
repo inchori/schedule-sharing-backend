@@ -1,13 +1,13 @@
-package com.schedulsharing.service;
+package com.schedulsharing.service.schedule;
 
-import com.schedulsharing.web.dto.resource.MyScheduleResource;
 import com.schedulsharing.domain.member.Member;
-import com.schedulsharing.domain.schedule.MySchedule;
-import com.schedulsharing.excpetion.MyScheduleNotFoundException;
-import com.schedulsharing.excpetion.common.InvalidGrantException;
-import com.schedulsharing.service.member.exception.MemberNotFoundException;
 import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.domain.schedule.MySchedule;
 import com.schedulsharing.domain.schedule.repository.myschedule.MyScheduleRepository;
+import com.schedulsharing.excpetion.MyScheduleNotFoundException;
+import com.schedulsharing.excpetion.PermissionException;
+import com.schedulsharing.service.member.exception.MemberNotFoundException;
+import com.schedulsharing.web.dto.resource.MyScheduleResource;
 import com.schedulsharing.web.schedule.my.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -53,7 +53,7 @@ public class MyScheduleService {
         List<MySchedule> myScheduleList = myScheduleRepository.findAllByEmail(member.getEmail(), yearMonth);
         for (MySchedule mySchedule : myScheduleList) {
             if (!member.getEmail().equals(mySchedule.getMember().getEmail())) {
-                throw new InvalidGrantException("조회 권한이 없습니다.");
+                throw new PermissionException();
             }
         }
         List<MyScheduleResponse> myScheduleResponseList = myScheduleList.stream()
@@ -66,7 +66,7 @@ public class MyScheduleService {
         Member member = findMemberByEmail(email);
         MySchedule mySchedule = mySchedulefindById(myScheduleId);
         if (!member.equals(mySchedule.getMember())) {
-            throw new InvalidGrantException("수정 권한이 없습니다.");
+            throw new PermissionException();
         }
         mySchedule.update(updateRequest);
         MyScheduleUpdateResponse myScheduleUpdateResponse = modelMapper.map(mySchedule, MyScheduleUpdateResponse.class);
@@ -77,7 +77,7 @@ public class MyScheduleService {
         Member member = findMemberByEmail(email);
         MySchedule mySchedule = mySchedulefindById(myScheduleId);
         if (!member.equals(mySchedule.getMember())) {
-            throw new InvalidGrantException("삭제 권한이 없습니다.");
+            throw new PermissionException();
         }
         myScheduleRepository.deleteById(myScheduleId);
         MyScheduleDeleteResponse myScheduleDeleteResponse = MyScheduleDeleteResponse.builder()

@@ -3,6 +3,7 @@ package com.schedulsharing.service;
 import com.schedulsharing.domain.member.Member;
 import com.schedulsharing.domain.club.repository.ClubRepository;
 import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.service.club.ClubService;
 import com.schedulsharing.web.club.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

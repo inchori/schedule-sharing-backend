@@ -1,19 +1,19 @@
 package com.schedulsharing.service;
 
-import com.schedulsharing.web.dto.resource.SuggestionResource;
 import com.schedulsharing.domain.club.Club;
-import com.schedulsharing.domain.vote.VoteCheck;
+import com.schedulsharing.domain.club.repository.ClubRepository;
 import com.schedulsharing.domain.member.Member;
+import com.schedulsharing.domain.member.repository.MemberRepository;
 import com.schedulsharing.domain.schedule.ScheduleSuggestion;
-import com.schedulsharing.excpetion.club.ClubNotFoundException;
-import com.schedulsharing.excpetion.common.InvalidGrantException;
-import com.schedulsharing.service.member.exception.MemberNotFoundException;
+import com.schedulsharing.domain.schedule.repository.suggestion.ScheduleSuggestionRepository;
+import com.schedulsharing.domain.vote.VoteCheck;
+import com.schedulsharing.domain.vote.repository.VoteCheckRepository;
+import com.schedulsharing.excpetion.PermissionException;
 import com.schedulsharing.excpetion.scheduleSuggestion.DuplicateVoteCheckException;
 import com.schedulsharing.excpetion.scheduleSuggestion.SuggestionNotFoundException;
-import com.schedulsharing.domain.club.repository.ClubRepository;
-import com.schedulsharing.domain.member.repository.MemberRepository;
-import com.schedulsharing.domain.vote.repository.VoteCheckRepository;
-import com.schedulsharing.domain.schedule.repository.suggestion.ScheduleSuggestionRepository;
+import com.schedulsharing.service.club.exception.ClubNotFoundException;
+import com.schedulsharing.service.member.exception.MemberNotFoundException;
+import com.schedulsharing.web.dto.resource.SuggestionResource;
 import com.schedulsharing.web.schedule.club.dto.suggestion.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -88,7 +88,7 @@ public class ScheduleSuggestionService {
         Member member = findMemberByEmail(email);
         ScheduleSuggestion suggestion = findSuggestionById(id);
         if (!suggestion.getMember().equals(member)) {
-            throw new InvalidGrantException("수정할 권한이 없습니다.");
+            throw new PermissionException();
         }
         suggestion.update(suggestionUpdateRequest);
         SuggestionResponse suggestionResponse = modelMapper.map(suggestion, SuggestionResponse.class);
@@ -100,7 +100,7 @@ public class ScheduleSuggestionService {
         Member member = findMemberByEmail(email);
         ScheduleSuggestion suggestion = findSuggestionById(id);
         if (!suggestion.getMember().equals(member)) {
-            throw new InvalidGrantException("삭제 권한이 없습니다.");
+            throw new PermissionException();
         }
         scheduleSuggestionRepository.deleteById(id);
         SuggestionDeleteResponse suggestionDeleteResponse = SuggestionDeleteResponse.builder()
@@ -165,14 +165,14 @@ public class ScheduleSuggestionService {
         List<Member> members = memberRepository.findAllByClubId(club.getId());
         List<Long> memberIdList = members.stream().map(member1 -> member1.getId()).collect(Collectors.toList());
         if (!memberIdList.contains(member.getId())) {
-            throw new InvalidGrantException("해당 클럽에 소속된 사람만 투표할 수 있습니다.");
+            throw new PermissionException();
         }
     }
 
     private Club findClubById(Long clubId) {
         Optional<Club> optionalClub = clubRepository.findById(clubId);
         if (optionalClub.isEmpty()) {
-            throw new ClubNotFoundException("클럽이 존재하지 않습니다.");
+            throw new ClubNotFoundException();
         }
         return optionalClub.get();
     }

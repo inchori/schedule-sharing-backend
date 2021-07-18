@@ -1,5 +1,7 @@
 package com.schedulsharing.service;
 
+import com.schedulsharing.service.club.ClubService;
+import com.schedulsharing.service.schedule.ClubScheduleService;
 import com.schedulsharing.web.club.dto.ClubCreateRequest;
 import com.schedulsharing.web.club.dto.ClubCreateResponse;
 import com.schedulsharing.domain.member.Member;

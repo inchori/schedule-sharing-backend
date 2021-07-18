@@ -5,7 +5,7 @@ import com.schedulsharing.web.club.dto.ClubCreateResponse;
 import com.schedulsharing.web.club.dto.ClubInviteRequest;
 import com.schedulsharing.web.club.dto.ClubUpdateRequest;
 import com.schedulsharing.web.dto.resource.ClubResource;
-import com.schedulsharing.service.ClubService;
+import com.schedulsharing.service.club.ClubService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;

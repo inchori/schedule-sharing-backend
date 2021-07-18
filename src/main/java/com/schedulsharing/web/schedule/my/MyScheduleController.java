@@ -4,7 +4,7 @@ import com.schedulsharing.web.schedule.my.dto.MyScheduleCreateRequest;
 import com.schedulsharing.web.schedule.my.dto.MyScheduleCreateResponse;
 import com.schedulsharing.web.schedule.my.dto.MyScheduleUpdateRequest;
 import com.schedulsharing.web.dto.resource.MyScheduleResource;
-import com.schedulsharing.service.MyScheduleService;
+import com.schedulsharing.service.schedule.MyScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.EntityModel;
