@@ -4,9 +4,9 @@ import com.schedulsharing.domain.member.Member;
 import com.schedulsharing.domain.member.repository.MemberRepository;
 import com.schedulsharing.domain.schedule.MySchedule;
 import com.schedulsharing.domain.schedule.repository.myschedule.MyScheduleRepository;
-import com.schedulsharing.excpetion.MyScheduleNotFoundException;
 import com.schedulsharing.excpetion.PermissionException;
 import com.schedulsharing.service.member.exception.MemberNotFoundException;
+import com.schedulsharing.service.schedule.exception.MyScheduleNotFoundException;
 import com.schedulsharing.web.dto.resource.MyScheduleResource;
 import com.schedulsharing.web.schedule.my.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -90,7 +90,7 @@ public class MyScheduleService {
     private MySchedule mySchedulefindById(Long myScheduleId) {
         Optional<MySchedule> optionalMySchedule = myScheduleRepository.findById(myScheduleId);
         if (optionalMySchedule.isEmpty()) {
-            throw new MyScheduleNotFoundException("내 스케줄이 존재하지 않습니다.");
+            throw new MyScheduleNotFoundException();
         }
         return optionalMySchedule.get();
     }

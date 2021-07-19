@@ -3,7 +3,7 @@ package com.schedulsharing.config;
 import com.schedulsharing.security.JwtAccessDeniedHandler;
 import com.schedulsharing.security.JwtAuthenticationEntryPoint;
 import com.schedulsharing.security.JwtFilter;
-import com.schedulsharing.service.CustomUserDetailsService;
+import com.schedulsharing.service.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;

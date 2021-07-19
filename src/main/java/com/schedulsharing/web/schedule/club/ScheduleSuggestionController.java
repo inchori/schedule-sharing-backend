@@ -5,7 +5,7 @@ import com.schedulsharing.web.schedule.club.dto.suggestion.SuggestionCreateReque
 import com.schedulsharing.web.schedule.club.dto.suggestion.SuggestionCreateResponse;
 import com.schedulsharing.web.schedule.club.dto.suggestion.SuggestionUpdateRequest;
 import com.schedulsharing.web.schedule.club.dto.suggestion.SuggestionVoteRequest;
-import com.schedulsharing.service.ScheduleSuggestionService;
+import com.schedulsharing.service.suggestion.ScheduleSuggestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.EntityModel;

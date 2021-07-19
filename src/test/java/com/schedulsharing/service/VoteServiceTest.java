@@ -2,6 +2,7 @@ package com.schedulsharing.service;
 
 import com.schedulsharing.service.club.ClubService;
 import com.schedulsharing.service.member.MemberService;
+import com.schedulsharing.service.suggestion.ScheduleSuggestionService;
 import com.schedulsharing.service.vote.VoteService;
 import com.schedulsharing.web.club.dto.ClubCreateRequest;
 import com.schedulsharing.web.club.dto.ClubCreateResponse;

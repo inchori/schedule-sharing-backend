@@ -15,7 +15,7 @@ import com.schedulsharing.domain.member.repository.MemberRepository;
 import com.schedulsharing.domain.schedule.repository.suggestion.ScheduleSuggestionRepository;
 import com.schedulsharing.service.club.ClubService;
 import com.schedulsharing.service.member.MemberService;
-import com.schedulsharing.service.ScheduleSuggestionService;
+import com.schedulsharing.service.suggestion.ScheduleSuggestionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

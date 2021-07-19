@@ -1,4 +1,4 @@
-package com.schedulsharing.service;
+package com.schedulsharing.service.security;
 
 import com.schedulsharing.domain.member.Member;
 import lombok.Getter;

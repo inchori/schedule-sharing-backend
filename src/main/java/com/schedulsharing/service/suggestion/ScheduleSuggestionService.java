@@ -1,4 +1,4 @@
-package com.schedulsharing.service;
+package com.schedulsharing.service.suggestion;
 
 import com.schedulsharing.domain.club.Club;
 import com.schedulsharing.domain.club.repository.ClubRepository;
@@ -9,8 +9,8 @@ import com.schedulsharing.domain.schedule.repository.suggestion.ScheduleSuggesti
 import com.schedulsharing.domain.vote.VoteCheck;
 import com.schedulsharing.domain.vote.repository.VoteCheckRepository;
 import com.schedulsharing.excpetion.PermissionException;
-import com.schedulsharing.excpetion.scheduleSuggestion.DuplicateVoteCheckException;
-import com.schedulsharing.excpetion.scheduleSuggestion.SuggestionNotFoundException;
+import com.schedulsharing.service.suggestion.exception.DuplicateVoteCheckException;
+import com.schedulsharing.service.suggestion.exception.SuggestionNotFoundException;
 import com.schedulsharing.service.club.exception.ClubNotFoundException;
 import com.schedulsharing.service.member.exception.MemberNotFoundException;
 import com.schedulsharing.web.dto.resource.SuggestionResource;
@@ -55,7 +55,7 @@ public class ScheduleSuggestionService {
     public EntityModel<SuggestionVoteCheckResponse> getSuggestion(Long id, String email) {
         Optional<ScheduleSuggestion> optionalScheduleSuggestion = scheduleSuggestionRepository.findById(id);
         if (optionalScheduleSuggestion.isEmpty()) {
-            throw new SuggestionNotFoundException("클럽스케줄제안이 없습니다.");
+            throw new SuggestionNotFoundException();
         }
         ScheduleSuggestion scheduleSuggestion = optionalScheduleSuggestion.get();
         Optional<List<VoteCheck>> voteCheckAgree = voteCheckRepository.findBySuggestionIdAndAgreeTrue(id);
@@ -137,7 +137,7 @@ public class ScheduleSuggestionService {
         Club club = suggestion.getClub();
         checkClubMember(member, club); //클럽원인지 검사
         if (!voteCheckRepository.findBySuggestionIdAndMemberId(suggestionId, member.getId()).isEmpty()) {
-            throw new DuplicateVoteCheckException("중복투표는 불가능합니다.");
+            throw new DuplicateVoteCheckException();
         }
         VoteCheck voteCheck = VoteCheck.createVoteCheck(suggestionVoteRequest, member, suggestion);
         VoteCheck vote = voteCheckRepository.save(voteCheck);
@@ -180,7 +180,7 @@ public class ScheduleSuggestionService {
     private ScheduleSuggestion findSuggestionById(Long suggestionId) {
         Optional<ScheduleSuggestion> optionalScheduleSuggestion = scheduleSuggestionRepository.findById(suggestionId);
         if (optionalScheduleSuggestion.isEmpty()) {
-            throw new SuggestionNotFoundException("클럽스케줄제안이 없습니다.");
+            throw new SuggestionNotFoundException();
         }
         return optionalScheduleSuggestion.get();
     }
