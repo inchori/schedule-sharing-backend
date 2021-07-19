@@ -97,34 +97,11 @@ public class VoteServiceTest {
         assertEquals(updateResponse.isAgree(), false);
     }
 
-
-    private SuggestionCreateResponse createSuggestion() {
-        String title = "테스트 제안 제목";
-        String contents = "테스트 제안 내용";
-        String location = "테스트 제안 위치";
-        int minMember = 2;
-        String email = "test@example.com";
-        Member member = memberRepository.findByEmail(email).get(); //setUp에서 생성한 멤버
-        ClubCreateResponse clubCreateResponse = createClub(member, "testClubName", "밥");
-        SuggestionCreateRequest suggestionCreateRequest = SuggestionCreateRequest.builder()
-                .title(title)
-                .contents(contents)
-                .location(location)
-                .minMember(minMember)
-                .scheduleStartDate(LocalDateTime.of(2021, 3, 10, 0, 0))
-                .scheduleEndDate(LocalDateTime.of(2021, 3, 10, 0, 0))
-                .voteStartDate(LocalDateTime.of(2021, 3, 5, 0, 0))
-                .voteEndDate(LocalDateTime.of(2021, 3, 8, 0, 0))
-                .clubId(clubCreateResponse.getClubId())
-                .build();
-        return scheduleSuggestionService.create(suggestionCreateRequest, email).getContent();
-    }
-
     private ClubCreateResponse createClub(Member savedMember, String clubName, String categories) {
         ClubCreateRequest clubCreateRequest = ClubCreateRequest.builder()
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        return clubService.createClub(clubCreateRequest, savedMember.getEmail()).getContent();
+        return clubService.createClub(clubCreateRequest, savedMember.getEmail());
     }
 }

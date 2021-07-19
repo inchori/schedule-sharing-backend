@@ -9,11 +9,9 @@ import com.schedulsharing.excpetion.PermissionException;
 import com.schedulsharing.service.club.exception.ClubNotFoundException;
 import com.schedulsharing.service.member.exception.MemberNotFoundException;
 import com.schedulsharing.web.club.dto.*;
-import com.schedulsharing.web.dto.resource.ClubResource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +27,7 @@ public class ClubService {
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
-    public EntityModel<ClubCreateResponse> createClub(ClubCreateRequest clubCreateRequest, String email) {
+    public ClubCreateResponse createClub(ClubCreateRequest clubCreateRequest, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         MemberClub memberClub = MemberClub.createMemberClub(member);
 
@@ -37,22 +35,18 @@ public class ClubService {
 
         Club savedClub = clubRepository.save(club);
 
-        ClubCreateResponse clubCreateResponse = modelMapper.map(savedClub, ClubCreateResponse.class);
-
-        return ClubResource.createClubLink(clubCreateResponse);
+        return modelMapper.map(savedClub, ClubCreateResponse.class);
     }
 
     @Transactional(readOnly = true)
-    public EntityModel<ClubResponse> getClub(Long clubId, String email) {
+    public ClubGetResponse getClub(Long clubId, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Club club = clubRepository.findById(clubId).orElseThrow(ClubNotFoundException::new);
 
-        ClubResponse clubResponse = modelMapper.map(club, ClubResponse.class);
-
-        return ClubResource.getOneClubLink(clubResponse, member.getId());
+        return modelMapper.map(club, ClubGetResponse.class);
     }
 
-    public EntityModel<ClubInviteResponse> invite(ClubInviteRequest clubInviteRequest, Long clubId, String email) {
+    public ClubInviteResponse invite(ClubInviteRequest clubInviteRequest, Long clubId, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Club club = clubRepository.findById(clubId).orElseThrow(ClubNotFoundException::new);
 
@@ -67,13 +61,11 @@ public class ClubService {
         List<MemberClub> memberClubs = MemberClub.inviteMemberClub(members);
         Club.inviteClub(club, memberClubs);
 
-        ClubInviteResponse clubInviteResponse = new ClubInviteResponse(true, "초대를 완료하였습니다.");
-
-        return ClubResource.inviteClubLink(clubInviteResponse, clubId);
+        return new ClubInviteResponse(true, "초대를 완료하였습니다.");
     }
 
 
-    public EntityModel<ClubUpdateResponse> update(Long clubId, ClubUpdateRequest clubUpdateRequest, String email) {
+    public ClubUpdateResponse update(Long clubId, ClubUpdateRequest clubUpdateRequest, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Club club = clubRepository.findById(clubId).orElseThrow(ClubNotFoundException::new);
         if (!member.getId().equals(club.getLeaderId())) {
@@ -81,20 +73,16 @@ public class ClubService {
         }
         club.update(clubUpdateRequest.getClubName(), clubUpdateRequest.getCategories());
 
-        ClubUpdateResponse clubUpdateResponse = modelMapper.map(club, ClubUpdateResponse.class);
-
-        return ClubResource.updateClubLink(clubUpdateResponse);
+        return modelMapper.map(club, ClubUpdateResponse.class);
     }
 
-    public EntityModel<ClubDeleteResponse> delete(Long clubId, String email) {
+    public ClubDeleteResponse delete(Long clubId, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Club club = clubRepository.findById(clubId).orElseThrow(ClubNotFoundException::new);
         if (!member.getId().equals(club.getLeaderId())) {
             throw new PermissionException();
         }
         clubRepository.deleteById(clubId);
-        ClubDeleteResponse clubDeleteResponse = new ClubDeleteResponse(true, "모임을 삭제하였습니다");
-
-        return ClubResource.deleteClubLink(clubDeleteResponse, clubId);
+        return new ClubDeleteResponse(true, "모임을 삭제하였습니다");
     }
 }

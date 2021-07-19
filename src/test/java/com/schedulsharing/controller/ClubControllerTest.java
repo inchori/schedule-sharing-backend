@@ -1,5 +1,9 @@
 package com.schedulsharing.controller;
 
+import com.schedulsharing.domain.club.repository.ClubRepository;
+import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.service.club.ClubService;
+import com.schedulsharing.service.member.MemberService;
 import com.schedulsharing.web.club.dto.ClubCreateRequest;
 import com.schedulsharing.web.club.dto.ClubCreateResponse;
 import com.schedulsharing.web.club.dto.ClubInviteRequest;
@@ -7,10 +11,6 @@ import com.schedulsharing.web.club.dto.ClubUpdateRequest;
 import com.schedulsharing.web.member.dto.LoginRequestDto;
 import com.schedulsharing.web.member.dto.SignUpRequestDto;
 import com.schedulsharing.web.member.dto.SignUpResponseDto;
-import com.schedulsharing.domain.club.repository.ClubRepository;
-import com.schedulsharing.domain.member.repository.MemberRepository;
-import com.schedulsharing.service.club.ClubService;
-import com.schedulsharing.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,8 +24,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.List;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -37,8 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-
-class ClubControllerTest extends ApiDocumentationTest{
+class ClubControllerTest extends ApiDocumentationTest {
     @Autowired
     private MemberService memberService;
     @Autowired
@@ -85,17 +82,7 @@ class ClubControllerTest extends ApiDocumentationTest{
                 .andExpect(jsonPath("clubName").exists())
                 .andExpect(jsonPath("categories").exists())
                 .andExpect(jsonPath("leaderId").exists())
-                .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.profile.href").exists())
                 .andDo(document("club-create",
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("club-invite").description("link to club-invite"),
-                                linkWithRel("club-getOne").description("link to club-getOne"),
-                                linkWithRel("club-update").description("link to club-update"),
-                                linkWithRel("club-delete").description("link to club-delete"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header"),
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
@@ -111,13 +98,7 @@ class ClubControllerTest extends ApiDocumentationTest{
                                 fieldWithPath("clubId").description("생성된 클럽의 고유 아이디"),
                                 fieldWithPath("clubName").description("생성된 클럽의 이름"),
                                 fieldWithPath("categories").description("생성된 클럽의 카테고리"),
-                                fieldWithPath("leaderId").description("클럽을 만든 멤버의 고유 아이디"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.club-invite.href").description("link to club-invite"),
-                                fieldWithPath("_links.club-getOne.href").description("link to club-getOne"),
-                                fieldWithPath("_links.club-update.href").description("link to club-update"),
-                                fieldWithPath("_links.club-delete.href").description("link to club-delete"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("leaderId").description("클럽을 만든 멤버의 고유 아이디")
                         )
                 ));
     }
@@ -157,19 +138,9 @@ class ClubControllerTest extends ApiDocumentationTest{
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("success").value(true))
-                .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.profile.href").exists())
                 .andDo(document("club-invite",
                         pathParameters(
                                 parameterWithName("clubId").description("초대할 클럽의 고유 아이디")
-                        ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile"),
-                                linkWithRel("club-create").description("link to club-create"),
-                                linkWithRel("club-update").description("link to club-update"),
-                                linkWithRel("club-getOne").description("link to club-getOne"),
-                                linkWithRel("club-delete").description("link to club-delete")
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header"),
@@ -183,13 +154,7 @@ class ClubControllerTest extends ApiDocumentationTest{
                         ),
                         responseFields(
                                 fieldWithPath("success").description("초대를 성공했다면 true 그렇지 않다면 false"),
-                                fieldWithPath("message").description("초대를 성공했는지에 대한 메시지"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.club-create.href").description("link to club-create"),
-                                fieldWithPath("_links.club-update.href").description("link to club-update"),
-                                fieldWithPath("_links.club-getOne.href").description("link to club-getOne"),
-                                fieldWithPath("_links.club-delete.href").description("link to club-delete"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("message").description("초대를 성공했는지에 대한 메시지")
                         )
                 ));
     }
@@ -226,8 +191,7 @@ class ClubControllerTest extends ApiDocumentationTest{
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(clubInviteRequest)))
                 .andDo(print())
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("success").value(false));
+                .andExpect(status().isForbidden());
     }
 
     @DisplayName("클럽장인 경우 클럽 조회하면 추가적인 링크가 보여야한다.")
@@ -240,23 +204,9 @@ class ClubControllerTest extends ApiDocumentationTest{
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("clubId").exists())
                 .andExpect(jsonPath("clubName").exists())
-                .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.club-create.href").exists())
-                .andExpect(jsonPath("_links.club-invite.href").exists())
-                .andExpect(jsonPath("_links.club-update.href").exists())
-                .andExpect(jsonPath("_links.club-delete.href").exists())
-                .andExpect(jsonPath("_links.profile.href").exists())
                 .andDo(document("club-getOne",
                         pathParameters(
                                 parameterWithName("clubId").description("조회할 클럽의 고유 아이디")
-                        ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile"),
-                                linkWithRel("club-create").description("link to club-create"),
-                                linkWithRel("club-invite").description("link to club-invite"),
-                                linkWithRel("club-update").description("link to club-invite"),
-                                linkWithRel("club-delete").description("link to club-delete")
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
@@ -268,13 +218,7 @@ class ClubControllerTest extends ApiDocumentationTest{
                                 fieldWithPath("clubId").description("조회한 클럽의 고유아이디"),
                                 fieldWithPath("clubName").description("조회한 클럽의 이름"),
                                 fieldWithPath("categories").description("조회한 클럽의 카테고리"),
-                                fieldWithPath("leaderId").description("조회한 클럽을 만든 멤버의 고유아이디"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.club-create.href").description("link to club-create"),
-                                fieldWithPath("_links.club-update.href").description("link to club-update, 클럽장인경우에만 보입니다."),
-                                fieldWithPath("_links.club-invite.href").description("link to club-invite, 클럽장인경우에만 보입니다."),
-                                fieldWithPath("_links.club-delete.href").description("link to club-delete, 클럽장인경우에만 보입니다."),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("leaderId").description("조회한 클럽을 만든 멤버의 고유아이디")
                         )
                 ));
     }
@@ -295,10 +239,7 @@ class ClubControllerTest extends ApiDocumentationTest{
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("clubId").exists())
-                .andExpect(jsonPath("clubName").exists())
-                .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.club-create.href").exists())
-                .andExpect(jsonPath("_links.profile.href").exists());
+                .andExpect(jsonPath("clubName").exists());
     }
 
     @DisplayName("조회할 클럽이 없는 클럽인 경우")
@@ -307,7 +248,7 @@ class ClubControllerTest extends ApiDocumentationTest{
         mvc.perform(RestDocumentationRequestBuilders.get("/api/club/11111")
                 .header(HttpHeaders.AUTHORIZATION, getBearToken()))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("httpStatus").exists())
                 .andExpect(jsonPath("error").exists())
                 .andExpect(jsonPath("message").exists());
@@ -331,23 +272,11 @@ class ClubControllerTest extends ApiDocumentationTest{
                 .andExpect(jsonPath("clubName").exists())
                 .andExpect(jsonPath("categories").exists())
                 .andExpect(jsonPath("leaderId").exists())
-                .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.club-create.href").exists())
-                .andExpect(jsonPath("_links.club-invite.href").exists())
-                .andExpect(jsonPath("_links.club-delete.href").exists())
-                .andExpect(jsonPath("_links.profile.href").exists())
                 .andDo(document("club-update",
                         pathParameters(
                                 parameterWithName("clubId").description("수정할 클럽의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile"),
-                                linkWithRel("club-create").description("link to club-create"),
-                                linkWithRel("club-getOne").description("link to club-getOne"),
-                                linkWithRel("club-invite").description("link to club-invite"),
-                                linkWithRel("club-delete").description("link to club-delete")
-                        ),
+
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type"),
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
@@ -359,13 +288,7 @@ class ClubControllerTest extends ApiDocumentationTest{
                                 fieldWithPath("clubId").description("수정된 클럽의 고유 아이디"),
                                 fieldWithPath("clubName").description("수정된 클럽의 이름"),
                                 fieldWithPath("categories").description("수정된 클럽의 카테고리"),
-                                fieldWithPath("leaderId").description("클럽을 만든 멤버의 고유 아이디"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.club-create.href").description("link to club-create"),
-                                fieldWithPath("_links.club-delete.href").description("link to club-delete"),
-                                fieldWithPath("_links.club-getOne.href").description("link to club-getOne"),
-                                fieldWithPath("_links.club-invite.href").description("link to club-invite"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("leaderId").description("클럽을 만든 멤버의 고유 아이디")
                         )
                 ));
     }
@@ -381,17 +304,10 @@ class ClubControllerTest extends ApiDocumentationTest{
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("success").value(true))
                 .andExpect(jsonPath("message").exists())
-                .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.club-create.href").exists())
-                .andExpect(jsonPath("_links.profile.href").exists())
+
                 .andDo(document("club-delete",
                         pathParameters(
                                 parameterWithName("clubId").description("삭제할 클럽의 고유 아이디")
-                        ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile"),
-                                linkWithRel("club-create").description("link to club-create")
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
@@ -401,10 +317,7 @@ class ClubControllerTest extends ApiDocumentationTest{
                         ),
                         responseFields(
                                 fieldWithPath("success").description("삭제를 성공했다면 true 그렇지 않다면 false"),
-                                fieldWithPath("message").description("삭제를 성공했는지에 대한 메시지"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.club-create.href").description("link to club-create"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("message").description("삭제를 성공했는지에 대한 메시지")
                         )
                 ));
     }
@@ -434,7 +347,7 @@ class ClubControllerTest extends ApiDocumentationTest{
                 .clubName("동네친구")
                 .categories("밥")
                 .build();
-        ClubCreateResponse clubCreateResponse = clubService.createClub(clubCreateRequest, email).getContent();
+        ClubCreateResponse clubCreateResponse = clubService.createClub(clubCreateRequest, email);
         return clubCreateResponse.getClubId();
     }
 

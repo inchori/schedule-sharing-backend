@@ -89,7 +89,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email).getContent();
+        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email);
 
         ClubScheduleCreateRequest createRequest = ClubScheduleCreateRequest.builder()
                 .name("클럽 스케줄 생성 테스트")
@@ -455,7 +455,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        return clubService.createClub(clubCreateRequest, savedMember.getEmail()).getContent();
+        return clubService.createClub(clubCreateRequest, savedMember.getEmail());
     }
 
     private ClubScheduleCreateResponse createClubScheduleByTest() {
@@ -466,7 +466,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email).getContent();
+        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email);
 
         ClubScheduleCreateRequest createRequest = ClubScheduleCreateRequest.builder()
                 .name("클럽 스케줄 생성 테스트")
@@ -486,7 +486,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email).getContent();
+        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email);
 
         ClubScheduleCreateRequest createRequest = ClubScheduleCreateRequest.builder()
                 .name("클럽 스케줄 생성 테스트2")

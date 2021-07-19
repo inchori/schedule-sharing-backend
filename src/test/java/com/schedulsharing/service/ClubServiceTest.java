@@ -50,7 +50,7 @@ class ClubServiceTest {
         String categories = "밥";
         ClubCreateResponse clubCreateResponse = createClub(savedMember, clubName, categories);
         Long clubId = clubCreateResponse.getClubId();
-        ClubResponse clubResponse = clubService.getClub(clubId, savedMember.getEmail()).getContent();
+        ClubGetResponse clubResponse = clubService.getClub(clubId, savedMember.getEmail());
         assertEquals(clubResponse.getClubId(), clubId);
         assertEquals(clubResponse.getClubName(), clubName);
         assertEquals(clubResponse.getCategories(), categories);
@@ -71,7 +71,7 @@ class ClubServiceTest {
                 .clubName(updateClubName)
                 .categories(updateClubCategories)
                 .build();
-        ClubUpdateResponse clubUpdateResponse = clubService.update(clubId, clubUpdateRequest, savedMember.getEmail()).getContent();
+        ClubUpdateResponse clubUpdateResponse = clubService.update(clubId, clubUpdateRequest, savedMember.getEmail());
 
         assertEquals(clubUpdateResponse.getClubId(), clubId);
         assertEquals(clubUpdateResponse.getClubName(), updateClubName);
@@ -88,7 +88,7 @@ class ClubServiceTest {
                 .clubName("testClubName")
                 .categories("밥")
                 .build();
-        ClubCreateResponse result = clubService.createClub(clubCreateRequest, savedMember.getEmail()).getContent();
+        ClubCreateResponse result = clubService.createClub(clubCreateRequest, savedMember.getEmail());
 
         clubService.delete(result.getClubId(), savedMember.getEmail());
 
@@ -110,6 +110,6 @@ class ClubServiceTest {
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        return clubService.createClub(clubCreateRequest, savedMember.getEmail()).getContent();
+        return clubService.createClub(clubCreateRequest, savedMember.getEmail());
     }
 }

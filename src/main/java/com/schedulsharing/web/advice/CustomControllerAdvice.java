@@ -1,6 +1,7 @@
 package com.schedulsharing.web.advice;
 
 import com.schedulsharing.excpetion.BusinessException;
+import com.schedulsharing.excpetion.PermissionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,5 +18,16 @@ public class CustomControllerAdvice {
                 .build();
 
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PermissionException.class)
+    public ResponseEntity<ApiError> permisstionExceptionHandler(PermissionException ex) {
+        ApiError apiError = ApiError.builder()
+                .httpStatus(HttpStatus.FORBIDDEN)
+                .error(ex.getClass().getSimpleName())
+                .message(ex.getMessage())
+                .build();
+
+        return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
 }

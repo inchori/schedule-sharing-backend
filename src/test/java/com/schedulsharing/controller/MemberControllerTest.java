@@ -276,7 +276,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                 .header(HttpHeaders.AUTHORIZATION, getBearToken())
                 .param("email", "test3@example.com"))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("httpStatus").exists())
                 .andExpect(jsonPath("error").exists())
                 .andExpect(jsonPath("message").exists())
