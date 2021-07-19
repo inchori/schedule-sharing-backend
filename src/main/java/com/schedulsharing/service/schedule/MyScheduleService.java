@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.YearMonth;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +29,7 @@ public class MyScheduleService {
     private final ModelMapper modelMapper;
 
     public EntityModel<MyScheduleCreateResponse> create(MyScheduleCreateRequest myScheduleCreateRequest, String email) {
-        Member member = findMemberByEmail(email);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
         MySchedule mySchedule = MySchedule.createMySchedule(myScheduleCreateRequest, member);
         MySchedule savedMySchedule = myScheduleRepository.save(mySchedule);
@@ -41,7 +40,7 @@ public class MyScheduleService {
 
     @Transactional(readOnly = true)
     public EntityModel<MyScheduleResponse> getMySchedule(Long myScheduleId, String email) {
-        MySchedule mySchedule = mySchedulefindById(myScheduleId);
+        MySchedule mySchedule = myScheduleRepository.findById(myScheduleId).orElseThrow(MyScheduleNotFoundException::new);
         MyScheduleResponse myScheduleResponse = modelMapper.map(mySchedule, MyScheduleResponse.class);
 
         return MyScheduleResource.getMyScheduleLink(myScheduleResponse);
@@ -49,7 +48,7 @@ public class MyScheduleService {
 
     @Transactional(readOnly = true)
     public CollectionModel<EntityModel<MyScheduleResponse>> getMyScheduleList(YearMonth yearMonth, String email) {
-        Member member = findMemberByEmail(email);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         List<MySchedule> myScheduleList = myScheduleRepository.findAllByEmail(member.getEmail(), yearMonth);
         for (MySchedule mySchedule : myScheduleList) {
             if (!member.getEmail().equals(mySchedule.getMember().getEmail())) {
@@ -63,8 +62,8 @@ public class MyScheduleService {
     }
 
     public EntityModel<MyScheduleUpdateResponse> update(Long myScheduleId, MyScheduleUpdateRequest updateRequest, String email) {
-        Member member = findMemberByEmail(email);
-        MySchedule mySchedule = mySchedulefindById(myScheduleId);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        MySchedule mySchedule = myScheduleRepository.findById(myScheduleId).orElseThrow(MyScheduleNotFoundException::new);
         if (!member.equals(mySchedule.getMember())) {
             throw new PermissionException();
         }
@@ -74,8 +73,8 @@ public class MyScheduleService {
     }
 
     public EntityModel<MyScheduleDeleteResponse> delete(Long myScheduleId, String email) {
-        Member member = findMemberByEmail(email);
-        MySchedule mySchedule = mySchedulefindById(myScheduleId);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        MySchedule mySchedule = myScheduleRepository.findById(myScheduleId).orElseThrow(MyScheduleNotFoundException::new);
         if (!member.equals(mySchedule.getMember())) {
             throw new PermissionException();
         }
@@ -85,21 +84,5 @@ public class MyScheduleService {
                 .success(true)
                 .build();
         return MyScheduleResource.deleteMyScheduleLink(myScheduleId, myScheduleDeleteResponse);
-    }
-
-    private MySchedule mySchedulefindById(Long myScheduleId) {
-        Optional<MySchedule> optionalMySchedule = myScheduleRepository.findById(myScheduleId);
-        if (optionalMySchedule.isEmpty()) {
-            throw new MyScheduleNotFoundException();
-        }
-        return optionalMySchedule.get();
-    }
-
-    private Member findMemberByEmail(String email) {
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
-        if (optionalMember.isEmpty()) {
-            throw new MemberNotFoundException();
-        }
-        return optionalMember.get();
     }
 }

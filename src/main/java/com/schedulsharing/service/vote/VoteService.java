@@ -16,8 +16,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -27,8 +25,8 @@ public class VoteService {
     private final ModelMapper modelMapper;
 
     public EntityModel<SuggestionVoteUpdateResponse> updateVote(Long id, SuggestionVoteUpdateRequest updateRequest, String email) {
-        Member member = findMemberByEmail(email);
-        VoteCheck voteCheck = findVoteById(id);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        VoteCheck voteCheck = voteCheckRepository.findById(id).orElseThrow(VoteNotFoundException::new);
         if (!voteCheck.getMember().equals(member)) {
             throw new PermissionException();
         }
@@ -36,21 +34,5 @@ public class VoteService {
         SuggestionVoteUpdateResponse voteUpdateResponse = modelMapper.map(voteCheck, SuggestionVoteUpdateResponse.class);
 
         return SuggestionResource.updateVoteLink(voteUpdateResponse);
-    }
-
-    private Member findMemberByEmail(String email) {
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
-        if (optionalMember.isEmpty()) {
-            throw new MemberNotFoundException();
-        }
-        return optionalMember.get();
-    }
-
-    private VoteCheck findVoteById(Long id) {
-        Optional<VoteCheck> optionalVote = voteCheckRepository.findById(id);
-        if (optionalVote.isEmpty()) {
-            throw new VoteNotFoundException();
-        }
-        return optionalVote.get();
     }
 }

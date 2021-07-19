@@ -70,20 +70,20 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public EntityModel<MemberResponse> getMemberByEmail(String email) {
-        Member member = findMemberByEmail(email);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         MemberResponse memberResponse = modelMapper.map(member, MemberResponse.class);
         return MemberResource.getMemberByEmailLink(memberResponse);
     }
 
     @Transactional(readOnly = true)
     public EntityModel<MemberResponse> getMemberById(Long id) {
-        Member member = findMemberById(id);
+        Member member = memberRepository.findById(id).orElseThrow(MemberNotFoundException::new);
         MemberResponse memberResponse = modelMapper.map(member, MemberResponse.class);
         return MemberResource.getMemberById(memberResponse);
     }
 
     public EntityModel<MemberUpdateResponse> updateMember(Long id, MemberUpdateRequest memberUpdateRequest, String email) {
-        Member member = findMemberByEmail(email);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         if (!member.getId().equals(id)) {
             throw new PermissionException();
         }
@@ -93,7 +93,7 @@ public class MemberService {
     }
 
     public EntityModel<MemberDeleteResponse> deleteMember(Long id, String email) {
-        Member member = findMemberByEmail(email);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         if (!member.getId().equals(id)) {
             throw new PermissionException();
         }
@@ -103,21 +103,5 @@ public class MemberService {
                 .message("성공적으로 탈퇴하셨습니다.")
                 .build();
         return MemberResource.deleteMemberLink(id, memberDeleteResponse);
-    }
-
-    private Member findMemberByEmail(String email) {
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
-        if (optionalMember.isEmpty()) {
-            throw new MemberNotFoundException();
-        }
-        return optionalMember.get();
-    }
-
-    private Member findMemberById(Long memberId) {
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-        if (optionalMember.isEmpty()) {
-            throw new MemberNotFoundException();
-        }
-        return optionalMember.get();
     }
 }

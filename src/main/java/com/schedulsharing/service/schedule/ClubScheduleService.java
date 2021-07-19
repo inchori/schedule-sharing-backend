@@ -36,8 +36,8 @@ public class ClubScheduleService {
     private final ModelMapper modelMapper;
 
     public EntityModel<ClubScheduleCreateResponse> create(ClubScheduleCreateRequest createRequest, String email) {
-        Member member = findMemberByEmail(email);
-        Club club = findById(createRequest.getClubId());
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Club club = clubRepository.findById(createRequest.getClubId()).orElseThrow(ClubNotFoundException::new);
 
         ClubSchedule clubSchedule = ClubSchedule.createClubSchedule(createRequest, member, club);
         ClubSchedule savedClubSchedule = clubScheduleRepository.save(clubSchedule);
@@ -49,8 +49,8 @@ public class ClubScheduleService {
 
     @Transactional(readOnly = true)
     public EntityModel<ClubScheduleResponse> getClubSchedule(Long id, String email) {
-        Member member = findMemberByEmail(email);
-        ClubSchedule clubSchedule = clubScheduleFindById(id);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        ClubSchedule clubSchedule = clubScheduleRepository.findById(id).orElseThrow(ClubScheduleNotFoundException::new);
         ClubScheduleResponse response = modelMapper.map(clubSchedule, ClubScheduleResponse.class);
         return ClubScheduleResource.getClubScheduleLink(response, member.getEmail());
     }
@@ -66,8 +66,8 @@ public class ClubScheduleService {
     }
 
     public EntityModel<ClubScheduleUpdateResponse> update(Long id, ClubScheduleUpdateRequest clubScheduleUpdateRequest, String email) {
-        Member member = findMemberByEmail(email);
-        ClubSchedule clubSchedule = clubScheduleFindById(id);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        ClubSchedule clubSchedule = clubScheduleRepository.findById(id).orElseThrow(ClubScheduleNotFoundException::new);
         if (!member.equals(clubSchedule.getMember())) {
             throw new PermissionException();
         }
@@ -77,8 +77,8 @@ public class ClubScheduleService {
     }
 
     public EntityModel<ClubScheduleDeleteResponse> delete(Long id, String email) {
-        Member member = findMemberByEmail(email);
-        ClubSchedule clubSchedule = clubScheduleFindById(id);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        ClubSchedule clubSchedule = clubScheduleRepository.findById(id).orElseThrow(ClubScheduleNotFoundException::new);
         if (!member.equals(clubSchedule.getMember())) {
             throw new PermissionException();
         }
@@ -89,29 +89,5 @@ public class ClubScheduleService {
                 .build();
 
         return ClubScheduleResource.deleteClubScheduleLink(id, clubScheduleDeleteResponse);
-    }
-
-    private Member findMemberByEmail(String email) {
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
-        if (optionalMember.isEmpty()) {
-            throw new MemberNotFoundException();
-        }
-        return optionalMember.get();
-    }
-
-    private ClubSchedule clubScheduleFindById(Long id) {
-        Optional<ClubSchedule> optionalClubSchedule = clubScheduleRepository.findById(id);
-        if (optionalClubSchedule.isEmpty()) {
-            throw new ClubScheduleNotFoundException();
-        }
-        return optionalClubSchedule.get();
-    }
-
-    private Club findById(Long clubId) {
-        Optional<Club> optionalClub = clubRepository.findById(clubId);
-        if (optionalClub.isEmpty()) {
-            throw new ClubNotFoundException();
-        }
-        return optionalClub.get();
     }
 }

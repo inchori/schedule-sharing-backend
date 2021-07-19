@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +30,7 @@ public class ClubService {
     private final ModelMapper modelMapper;
 
     public EntityModel<ClubCreateResponse> createClub(ClubCreateRequest clubCreateRequest, String email) {
-        Member member = findMemberByEmail(email);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         MemberClub memberClub = MemberClub.createMemberClub(member);
 
         Club club = Club.createClub(clubCreateRequest.getClubName(), member.getId(), clubCreateRequest.getCategories(), memberClub);
@@ -45,8 +44,8 @@ public class ClubService {
 
     @Transactional(readOnly = true)
     public EntityModel<ClubResponse> getClub(Long clubId, String email) {
-        Member member = findMemberByEmail(email);
-        Club club = findById(clubId);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Club club = clubRepository.findById(clubId).orElseThrow(ClubNotFoundException::new);
 
         ClubResponse clubResponse = modelMapper.map(club, ClubResponse.class);
 
@@ -54,8 +53,8 @@ public class ClubService {
     }
 
     public EntityModel<ClubInviteResponse> invite(ClubInviteRequest clubInviteRequest, Long clubId, String email) {
-        Member member = findMemberByEmail(email);
-        Club club = findById(clubId);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Club club = clubRepository.findById(clubId).orElseThrow(ClubNotFoundException::new);
 
         if (!member.getId().equals(club.getLeaderId())) {
             throw new PermissionException();
@@ -63,7 +62,7 @@ public class ClubService {
         List<Long> memberIds = clubInviteRequest.getMemberIds();
         List<Member> members = new ArrayList<>();
         for (Long memberId : memberIds) {
-            members.add(findMemberById(memberId));
+            members.add(memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new));
         }
         List<MemberClub> memberClubs = MemberClub.inviteMemberClub(members);
         Club.inviteClub(club, memberClubs);
@@ -75,8 +74,8 @@ public class ClubService {
 
 
     public EntityModel<ClubUpdateResponse> update(Long clubId, ClubUpdateRequest clubUpdateRequest, String email) {
-        Member member = findMemberByEmail(email);
-        Club club = findById(clubId);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Club club = clubRepository.findById(clubId).orElseThrow(ClubNotFoundException::new);
         if (!member.getId().equals(club.getLeaderId())) {
             throw new PermissionException();
         }
@@ -88,8 +87,8 @@ public class ClubService {
     }
 
     public EntityModel<ClubDeleteResponse> delete(Long clubId, String email) {
-        Member member = findMemberByEmail(email);
-        Club club = findById(clubId);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Club club = clubRepository.findById(clubId).orElseThrow(ClubNotFoundException::new);
         if (!member.getId().equals(club.getLeaderId())) {
             throw new PermissionException();
         }
@@ -98,29 +97,4 @@ public class ClubService {
 
         return ClubResource.deleteClubLink(clubDeleteResponse, clubId);
     }
-
-    private Member findMemberById(Long memberId) {
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-        if (optionalMember.isEmpty()) {
-            throw new MemberNotFoundException();
-        }
-        return optionalMember.get();
-    }
-
-    private Member findMemberByEmail(String email) {
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
-        if (optionalMember.isEmpty()) {
-            throw new MemberNotFoundException();
-        }
-        return optionalMember.get();
-    }
-
-    private Club findById(Long clubId) {
-        Optional<Club> optionalClub = clubRepository.findById(clubId);
-        if (optionalClub.isEmpty()) {
-            throw new ClubNotFoundException();
-        }
-        return optionalClub.get();
-    }
-
 }

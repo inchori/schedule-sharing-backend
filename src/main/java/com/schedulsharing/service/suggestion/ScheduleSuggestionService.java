@@ -9,10 +9,10 @@ import com.schedulsharing.domain.schedule.repository.suggestion.ScheduleSuggesti
 import com.schedulsharing.domain.vote.VoteCheck;
 import com.schedulsharing.domain.vote.repository.VoteCheckRepository;
 import com.schedulsharing.excpetion.PermissionException;
-import com.schedulsharing.service.suggestion.exception.DuplicateVoteCheckException;
-import com.schedulsharing.service.suggestion.exception.SuggestionNotFoundException;
 import com.schedulsharing.service.club.exception.ClubNotFoundException;
 import com.schedulsharing.service.member.exception.MemberNotFoundException;
+import com.schedulsharing.service.suggestion.exception.DuplicateVoteCheckException;
+import com.schedulsharing.service.suggestion.exception.SuggestionNotFoundException;
 import com.schedulsharing.web.dto.resource.SuggestionResource;
 import com.schedulsharing.web.schedule.club.dto.suggestion.*;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +41,8 @@ public class ScheduleSuggestionService {
     private final ModelMapper modelMapper;
 
     public EntityModel<SuggestionCreateResponse> create(SuggestionCreateRequest suggestionCreateRequest, String email) {
-        Member member = findMemberByEmail(email);
-        Club club = findClubById(suggestionCreateRequest.getClubId());
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        Club club = clubRepository.findById(suggestionCreateRequest.getClubId()).orElseThrow(ClubNotFoundException::new);
         checkClubMember(member, club);
         ScheduleSuggestion suggestion = ScheduleSuggestion.createSuggestion(suggestionCreateRequest, member, club);
         ScheduleSuggestion savedSuggestion = scheduleSuggestionRepository.save(suggestion);
@@ -67,10 +67,7 @@ public class ScheduleSuggestionService {
             suggestionResponse.setVoteAgreeDto(VoteAgreeDto.builder().count(0).memberName(new ArrayList<>()).build());
         } else {
             List<String> memberNamesAgree = voteCheckAgree.get().stream().map(voteCheck -> voteCheck.getMember().getName()).collect(Collectors.toList());
-            System.out.println("" + voteCheckAgree.get().size());
-            for (String s : memberNamesAgree) {
-                System.out.println("s = " + s);
-            }
+
             suggestionResponse.setVoteAgreeDto(VoteAgreeDto.builder().count(memberNamesAgree.size()).memberName(memberNamesAgree).build());
         }
 
@@ -85,8 +82,8 @@ public class ScheduleSuggestionService {
     }
 
     public EntityModel<SuggestionResponse> update(Long id, SuggestionUpdateRequest suggestionUpdateRequest, String email) {
-        Member member = findMemberByEmail(email);
-        ScheduleSuggestion suggestion = findSuggestionById(id);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        ScheduleSuggestion suggestion = scheduleSuggestionRepository.findById(id).orElseThrow(SuggestionNotFoundException::new);
         if (!suggestion.getMember().equals(member)) {
             throw new PermissionException();
         }
@@ -97,8 +94,8 @@ public class ScheduleSuggestionService {
     }
 
     public EntityModel<SuggestionDeleteResponse> delete(Long id, String email) {
-        Member member = findMemberByEmail(email);
-        ScheduleSuggestion suggestion = findSuggestionById(id);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        ScheduleSuggestion suggestion = scheduleSuggestionRepository.findById(id).orElseThrow(SuggestionNotFoundException::new);
         if (!suggestion.getMember().equals(member)) {
             throw new PermissionException();
         }
@@ -132,11 +129,11 @@ public class ScheduleSuggestionService {
     }
 
     public EntityModel<SuggestionVoteResponse> vote(Long suggestionId, SuggestionVoteRequest suggestionVoteRequest, String email) {
-        Member member = findMemberByEmail(email);
-        ScheduleSuggestion suggestion = findSuggestionById(suggestionId);
+        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        ScheduleSuggestion suggestion = scheduleSuggestionRepository.findById(suggestionId).orElseThrow(SuggestionNotFoundException::new);
         Club club = suggestion.getClub();
         checkClubMember(member, club); //클럽원인지 검사
-        if (!voteCheckRepository.findBySuggestionIdAndMemberId(suggestionId, member.getId()).isEmpty()) {
+        if (voteCheckRepository.findBySuggestionIdAndMemberId(suggestionId, member.getId()).isPresent()) {
             throw new DuplicateVoteCheckException();
         }
         VoteCheck voteCheck = VoteCheck.createVoteCheck(suggestionVoteRequest, member, suggestion);
@@ -153,35 +150,11 @@ public class ScheduleSuggestionService {
         return SuggestionResource.getSuggestionVoteLink(response, email, suggestionId);
     }
 
-    private Member findMemberByEmail(String email) {
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
-        if (optionalMember.isEmpty()) {
-            throw new MemberNotFoundException();
-        }
-        return optionalMember.get();
-    }
-
     private void checkClubMember(Member member, Club club) {
         List<Member> members = memberRepository.findAllByClubId(club.getId());
-        List<Long> memberIdList = members.stream().map(member1 -> member1.getId()).collect(Collectors.toList());
+        List<Long> memberIdList = members.stream().map(Member::getId).collect(Collectors.toList());
         if (!memberIdList.contains(member.getId())) {
             throw new PermissionException();
         }
-    }
-
-    private Club findClubById(Long clubId) {
-        Optional<Club> optionalClub = clubRepository.findById(clubId);
-        if (optionalClub.isEmpty()) {
-            throw new ClubNotFoundException();
-        }
-        return optionalClub.get();
-    }
-
-    private ScheduleSuggestion findSuggestionById(Long suggestionId) {
-        Optional<ScheduleSuggestion> optionalScheduleSuggestion = scheduleSuggestionRepository.findById(suggestionId);
-        if (optionalScheduleSuggestion.isEmpty()) {
-            throw new SuggestionNotFoundException();
-        }
-        return optionalScheduleSuggestion.get();
     }
 }
