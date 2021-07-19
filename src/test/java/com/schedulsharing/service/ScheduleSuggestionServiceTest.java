@@ -1,19 +1,21 @@
 package com.schedulsharing.service;
 
-import com.schedulsharing.dto.Club.ClubCreateRequest;
-import com.schedulsharing.dto.Club.ClubCreateResponse;
-import com.schedulsharing.dto.Club.ClubInviteRequest;
-import com.schedulsharing.dto.member.SignUpRequestDto;
-import com.schedulsharing.dto.member.SignUpResponseDto;
-import com.schedulsharing.dto.suggestion.*;
-import com.schedulsharing.dto.yearMonth.YearMonthRequest;
-import com.schedulsharing.entity.member.Member;
-import com.schedulsharing.entity.schedule.ScheduleSuggestion;
-import com.schedulsharing.excpetion.common.InvalidGrantException;
-import com.schedulsharing.excpetion.scheduleSuggestion.DuplicateVoteCheckException;
-import com.schedulsharing.repository.ClubRepository;
-import com.schedulsharing.repository.MemberRepository;
-import com.schedulsharing.repository.suggestion.ScheduleSuggestionRepository;
+import com.schedulsharing.domain.club.repository.ClubRepository;
+import com.schedulsharing.domain.member.Member;
+import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.domain.schedule.ScheduleSuggestion;
+import com.schedulsharing.domain.schedule.repository.suggestion.ScheduleSuggestionRepository;
+import com.schedulsharing.excpetion.PermissionException;
+import com.schedulsharing.service.suggestion.exception.DuplicateVoteCheckException;
+import com.schedulsharing.service.club.ClubService;
+import com.schedulsharing.service.member.MemberService;
+import com.schedulsharing.service.suggestion.ScheduleSuggestionService;
+import com.schedulsharing.web.club.dto.ClubCreateRequest;
+import com.schedulsharing.web.club.dto.ClubCreateResponse;
+import com.schedulsharing.web.club.dto.ClubInviteRequest;
+import com.schedulsharing.web.member.dto.SignUpRequestDto;
+import com.schedulsharing.web.member.dto.SignUpResponseDto;
+import com.schedulsharing.web.schedule.club.dto.suggestion.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -192,12 +194,8 @@ class ScheduleSuggestionServiceTest {
 
             scheduleSuggestionService.create(suggestionCreateRequest, member.getEmail()).getContent();
         }
-
-        YearMonthRequest yearMonthRequest = YearMonthRequest.builder()
-                .yearMonth(YearMonth.of(2021, 3))
-                .build();
-
-        Collection<EntityModel<SuggestionResponse>> result = scheduleSuggestionService.getSuggestionListConfirm(clubCreateResponse.getClubId(), yearMonthRequest, member.getEmail()).getContent();
+        YearMonth yearMonth = YearMonth.of(2021, 3);
+        Collection<EntityModel<SuggestionResponse>> result = scheduleSuggestionService.getSuggestionListConfirm(clubCreateResponse.getClubId(), yearMonth, member.getEmail()).getContent();
         assertEquals(result.size(), 5);
     }
 
@@ -271,11 +269,8 @@ class ScheduleSuggestionServiceTest {
             scheduleSuggestionService.create(suggestionCreateRequest, member.getEmail()).getContent();
         }
 
-        SuggestionListRequest suggestionListRequest = SuggestionListRequest.builder()
-                .now(LocalDate.of(2021, 3, 8))
-                .build();
-
-        Collection<EntityModel<SuggestionResponse>> result = scheduleSuggestionService.getSuggestionList(clubCreateResponse.getClubId(), suggestionListRequest, member.getEmail()).getContent();
+        LocalDate now = LocalDate.of(2021, 3, 8);
+        Collection<EntityModel<SuggestionResponse>> result = scheduleSuggestionService.getSuggestionList(clubCreateResponse.getClubId(), now, member.getEmail()).getContent();
         assertEquals(result.size(), 6);
     }
 
@@ -390,7 +385,7 @@ class ScheduleSuggestionServiceTest {
         SuggestionVoteRequest suggestionVoteRequest = SuggestionVoteRequest.builder()
                 .agree(true)
                 .build();
-        assertThrows(InvalidGrantException.class,
+        assertThrows(PermissionException.class,
                 () -> scheduleSuggestionService.vote(createResponse.getId(), suggestionVoteRequest, "test2@example.com"));
     }
 
@@ -483,7 +478,7 @@ class ScheduleSuggestionServiceTest {
         SuggestionVoteResponse result = scheduleSuggestionService.vote(createResponse.getId(), suggestionVoteRequest, "test@example.com").getContent();
         ScheduleSuggestion scheduleSuggestion = scheduleSuggestionRepository.findById(createResponse.getId()).get();
         assertEquals(result.isAgree(), true);
-        assertEquals(scheduleSuggestion.isConfirm(),true);
+        assertEquals(scheduleSuggestion.isConfirm(), true);
     }
 
     private ClubCreateResponse createClub(Member savedMember, String clubName, String categories) {
@@ -491,6 +486,6 @@ class ScheduleSuggestionServiceTest {
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        return clubService.createClub(clubCreateRequest, savedMember.getEmail()).getContent();
+        return clubService.createClub(clubCreateRequest, savedMember.getEmail());
     }
 }

@@ -1,13 +1,14 @@
 package com.schedulsharing.service;
 
-import com.schedulsharing.dto.Club.ClubCreateRequest;
-import com.schedulsharing.dto.Club.ClubCreateResponse;
-import com.schedulsharing.dto.ClubSchedule.*;
-import com.schedulsharing.dto.yearMonth.YearMonthRequest;
-import com.schedulsharing.entity.member.Member;
-import com.schedulsharing.repository.ClubRepository;
-import com.schedulsharing.repository.MemberRepository;
-import com.schedulsharing.repository.clubSchedule.ClubScheduleRepository;
+import com.schedulsharing.service.club.ClubService;
+import com.schedulsharing.service.schedule.ClubScheduleService;
+import com.schedulsharing.web.club.dto.ClubCreateRequest;
+import com.schedulsharing.web.club.dto.ClubCreateResponse;
+import com.schedulsharing.domain.member.Member;
+import com.schedulsharing.domain.club.repository.ClubRepository;
+import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.domain.schedule.repository.clubSchedule.ClubScheduleRepository;
+import com.schedulsharing.web.schedule.club.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -184,11 +185,9 @@ class ClubScheduleServiceTest {
             clubScheduleService.create(createRequest, member.getEmail()).getContent();
         }
 
-        YearMonthRequest yearMonthRequest = YearMonthRequest.builder()
-                .yearMonth(YearMonth.of(2021, 3))
-                .build();
+        YearMonth yearMonth = YearMonth.of(2021,3);
 
-        Collection<EntityModel<ClubScheduleResponse>> clubScheduleList = clubScheduleService.getClubScheduleList(clubCreateResponse.getClubId(), yearMonthRequest, member.getEmail()).getContent();
+        Collection<EntityModel<ClubScheduleResponse>> clubScheduleList = clubScheduleService.getClubScheduleList(clubCreateResponse.getClubId(), yearMonth, member.getEmail()).getContent();
         //3월시작 3월끝 = 30개
         assertEquals(clubScheduleList.size(), 30);
     }
@@ -208,6 +207,6 @@ class ClubScheduleServiceTest {
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        return clubService.createClub(clubCreateRequest, savedMember.getEmail()).getContent();
+        return clubService.createClub(clubCreateRequest, savedMember.getEmail());
     }
 }

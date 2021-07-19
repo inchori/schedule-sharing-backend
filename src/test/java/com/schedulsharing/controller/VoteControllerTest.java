@@ -1,22 +1,22 @@
 package com.schedulsharing.controller;
 
-import com.schedulsharing.dto.Club.ClubCreateRequest;
-import com.schedulsharing.dto.Club.ClubCreateResponse;
-import com.schedulsharing.dto.member.LoginRequestDto;
-import com.schedulsharing.dto.member.SignUpRequestDto;
-import com.schedulsharing.dto.suggestion.SuggestionCreateRequest;
-import com.schedulsharing.dto.suggestion.SuggestionCreateResponse;
-import com.schedulsharing.dto.suggestion.SuggestionVoteRequest;
-import com.schedulsharing.dto.suggestion.SuggestionVoteResponse;
-import com.schedulsharing.dto.voteCheck.SuggestionVoteUpdateRequest;
-import com.schedulsharing.entity.member.Member;
-import com.schedulsharing.repository.ClubRepository;
-import com.schedulsharing.repository.MemberRepository;
-import com.schedulsharing.repository.VoteCheckRepository;
-import com.schedulsharing.repository.suggestion.ScheduleSuggestionRepository;
-import com.schedulsharing.service.ClubService;
-import com.schedulsharing.service.MemberService;
-import com.schedulsharing.service.ScheduleSuggestionService;
+import com.schedulsharing.web.club.dto.ClubCreateRequest;
+import com.schedulsharing.web.club.dto.ClubCreateResponse;
+import com.schedulsharing.web.member.dto.LoginRequestDto;
+import com.schedulsharing.web.member.dto.SignUpRequestDto;
+import com.schedulsharing.web.schedule.club.dto.suggestion.SuggestionCreateRequest;
+import com.schedulsharing.web.schedule.club.dto.suggestion.SuggestionCreateResponse;
+import com.schedulsharing.web.schedule.club.dto.suggestion.SuggestionVoteRequest;
+import com.schedulsharing.web.schedule.club.dto.suggestion.SuggestionVoteResponse;
+import com.schedulsharing.web.vote.dto.SuggestionVoteUpdateRequest;
+import com.schedulsharing.domain.member.Member;
+import com.schedulsharing.domain.club.repository.ClubRepository;
+import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.domain.vote.repository.VoteCheckRepository;
+import com.schedulsharing.domain.schedule.repository.suggestion.ScheduleSuggestionRepository;
+import com.schedulsharing.service.club.ClubService;
+import com.schedulsharing.service.member.MemberService;
+import com.schedulsharing.service.suggestion.ScheduleSuggestionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -139,7 +139,7 @@ public class VoteControllerTest extends ApiDocumentationTest{
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        return clubService.createClub(clubCreateRequest, savedMember.getEmail()).getContent();
+        return clubService.createClub(clubCreateRequest, savedMember.getEmail());
     }
 
     private String getBearToken() throws Exception {

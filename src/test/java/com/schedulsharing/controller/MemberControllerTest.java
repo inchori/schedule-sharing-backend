@@ -1,10 +1,10 @@
 package com.schedulsharing.controller;
 
-import com.schedulsharing.dto.Club.ClubCreateRequest;
-import com.schedulsharing.dto.member.*;
-import com.schedulsharing.repository.MemberRepository;
-import com.schedulsharing.service.ClubService;
-import com.schedulsharing.service.MemberService;
+import com.schedulsharing.web.club.dto.ClubCreateRequest;
+import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.service.club.ClubService;
+import com.schedulsharing.service.member.MemberService;
+import com.schedulsharing.web.member.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +20,7 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -29,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-class MemberControllerTest extends ApiDocumentationTest{
+class MemberControllerTest extends ApiDocumentationTest {
     @Autowired
     private MemberService memberService;
 
@@ -116,8 +115,7 @@ class MemberControllerTest extends ApiDocumentationTest{
                 .content(objectMapper.writeValueAsString(signUpRequestDto2)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("message").exists())
-                .andExpect(jsonPath("duplicate").value(true));
+                .andExpect(jsonPath("message").exists());
     }
 
     @DisplayName("중복된 이메일 체크")
@@ -137,9 +135,7 @@ class MemberControllerTest extends ApiDocumentationTest{
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(emailCheckRequestDto)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("message").exists())
-                .andExpect(jsonPath("duplicate").value(true))
                 .andDo(document("member-checkEmail",
                         links(
                                 linkWithRel("self").description("link to self"),
@@ -229,14 +225,9 @@ class MemberControllerTest extends ApiDocumentationTest{
                 .build();
         memberService.signup(signUpRequestDto2);
 
-        MemberSearchRequest memberSearchRequest = MemberSearchRequest.builder()
-                .email("test2@example.com")
-                .build();
-
         mvc.perform(get("/api/member/search")
                 .header(HttpHeaders.AUTHORIZATION, getBearToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(memberSearchRequest)))
+                .param("email", email2))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
@@ -249,11 +240,10 @@ class MemberControllerTest extends ApiDocumentationTest{
                                 linkWithRel("profile").description("link to profile")
                         ),
                         requestHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header"),
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
-                        requestFields(
-                                fieldWithPath("email").description("검색할 멤버의 이메일")
+                        requestParameters(
+                                parameterWithName("email").description("검색할 멤버의 이메일")
                         ),
                         responseHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type")
@@ -282,30 +272,20 @@ class MemberControllerTest extends ApiDocumentationTest{
         memberService.signup(signUpRequestDto);
 
 
-        MemberSearchRequest memberSearchRequest = MemberSearchRequest.builder()
-                .email("test3@example.com")
-                .build();
-
         mvc.perform(get("/api/member/search")
                 .header(HttpHeaders.AUTHORIZATION, getBearToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(memberSearchRequest)))
+                .param("email", "test3@example.com"))
                 .andDo(print())
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("httpStatus").exists())
                 .andExpect(jsonPath("error").exists())
                 .andExpect(jsonPath("message").exists())
                 .andDo(document("member-findByEmail-fail",
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header"),
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
-                        requestFields(
-                                fieldWithPath("email").description("검색할 멤버의 이메일")
+                        requestParameters(
+                                parameterWithName("email").description("검색할 멤버의 이메일")
                         ),
                         responseHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type")
@@ -313,9 +293,7 @@ class MemberControllerTest extends ApiDocumentationTest{
                         responseFields(
                                 fieldWithPath("httpStatus").description("httpStatus"),
                                 fieldWithPath("error").description("error 종류"),
-                                fieldWithPath("message").description("해당 이메일을 가진 멤버가 없다는 메시지"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("message").description("해당 이메일을 가진 멤버가 없다는 메시지")
                         )
                 ));
     }

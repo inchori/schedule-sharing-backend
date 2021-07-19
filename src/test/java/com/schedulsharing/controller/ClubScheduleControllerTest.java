@@ -1,20 +1,19 @@
 package com.schedulsharing.controller;
 
-import com.schedulsharing.dto.Club.ClubCreateRequest;
-import com.schedulsharing.dto.Club.ClubCreateResponse;
-import com.schedulsharing.dto.ClubSchedule.ClubScheduleCreateRequest;
-import com.schedulsharing.dto.ClubSchedule.ClubScheduleCreateResponse;
-import com.schedulsharing.dto.ClubSchedule.ClubScheduleUpdateRequest;
-import com.schedulsharing.dto.member.LoginRequestDto;
-import com.schedulsharing.dto.member.SignUpRequestDto;
-import com.schedulsharing.dto.yearMonth.YearMonthRequest;
-import com.schedulsharing.entity.member.Member;
-import com.schedulsharing.repository.ClubRepository;
-import com.schedulsharing.repository.MemberRepository;
-import com.schedulsharing.repository.clubSchedule.ClubScheduleRepository;
-import com.schedulsharing.service.ClubScheduleService;
-import com.schedulsharing.service.ClubService;
-import com.schedulsharing.service.MemberService;
+import com.schedulsharing.web.club.dto.ClubCreateRequest;
+import com.schedulsharing.web.club.dto.ClubCreateResponse;
+import com.schedulsharing.web.schedule.club.dto.ClubScheduleCreateRequest;
+import com.schedulsharing.web.schedule.club.dto.ClubScheduleCreateResponse;
+import com.schedulsharing.web.schedule.club.dto.ClubScheduleUpdateRequest;
+import com.schedulsharing.web.member.dto.LoginRequestDto;
+import com.schedulsharing.web.member.dto.SignUpRequestDto;
+import com.schedulsharing.domain.member.Member;
+import com.schedulsharing.domain.club.repository.ClubRepository;
+import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.domain.schedule.repository.clubSchedule.ClubScheduleRepository;
+import com.schedulsharing.service.schedule.ClubScheduleService;
+import com.schedulsharing.service.club.ClubService;
+import com.schedulsharing.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,8 +32,7 @@ import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.li
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -91,7 +89,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email).getContent();
+        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email);
 
         ClubScheduleCreateRequest createRequest = ClubScheduleCreateRequest.builder()
                 .name("클럽 스케줄 생성 테스트")
@@ -257,14 +255,10 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
             clubScheduleService.create(createRequest, member.getEmail()).getContent();
         }
 
-        YearMonthRequest yearMonthRequest = YearMonthRequest.builder()
-                .yearMonth(YearMonth.of(2021, 3))
-                .build();
-
         mvc.perform(RestDocumentationRequestBuilders.get("/api/clubSchedule/list/{clubId}", clubCreateResponse.getClubId())
                 .header(HttpHeaders.AUTHORIZATION, getBearToken())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(yearMonthRequest)))
+                .param("yearMonth", String.valueOf(YearMonth.of(2021,3))))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.clubScheduleList[0].id").exists())
@@ -283,11 +277,10 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                                 linkWithRel("profile").description("link to profile")
                         ),
                         requestHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type"),
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
-                        requestFields(
-                                fieldWithPath("yearMonth").description("클럽스케줄리스트를 조회할 year,month")
+                        requestParameters(
+                                parameterWithName("yearMonth").description("클럽스케줄리스트를 조회할 year,month")
                         ),
                         responseHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type")
@@ -462,7 +455,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        return clubService.createClub(clubCreateRequest, savedMember.getEmail()).getContent();
+        return clubService.createClub(clubCreateRequest, savedMember.getEmail());
     }
 
     private ClubScheduleCreateResponse createClubScheduleByTest() {
@@ -473,7 +466,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email).getContent();
+        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email);
 
         ClubScheduleCreateRequest createRequest = ClubScheduleCreateRequest.builder()
                 .name("클럽 스케줄 생성 테스트")
@@ -493,7 +486,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .clubName(clubName)
                 .categories(categories)
                 .build();
-        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email).getContent();
+        ClubCreateResponse content = clubService.createClub(clubCreateRequest, email);
 
         ClubScheduleCreateRequest createRequest = ClubScheduleCreateRequest.builder()
                 .name("클럽 스케줄 생성 테스트2")

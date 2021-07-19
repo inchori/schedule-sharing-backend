@@ -1,9 +1,9 @@
 package com.schedulsharing.config;
 
-import com.schedulsharing.jwt.JwtAccessDeniedHandler;
-import com.schedulsharing.jwt.JwtAuthenticationEntryPoint;
-import com.schedulsharing.jwt.JwtFilter;
-import com.schedulsharing.service.CustomUserDetailsService;
+import com.schedulsharing.security.JwtAccessDeniedHandler;
+import com.schedulsharing.security.JwtAuthenticationEntryPoint;
+import com.schedulsharing.security.JwtFilter;
+import com.schedulsharing.service.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -47,7 +47,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(passwordEncoder);
     }
 
-
     @Override
     @Bean
     protected AuthenticationManager authenticationManager() throws Exception {
@@ -81,7 +80,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/hello").permitAll()
                 .antMatchers("/api/authenticate").permitAll()
                 .antMatchers("/api/member/signup","/api/member/checkEmail").permitAll()
                 .anyRequest().authenticated();

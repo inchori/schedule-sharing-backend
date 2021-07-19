@@ -1,10 +1,11 @@
 package com.schedulsharing.service;
 
-import com.schedulsharing.dto.Club.ClubCreateRequest;
-import com.schedulsharing.dto.member.*;
-import com.schedulsharing.entity.member.Member;
-import com.schedulsharing.repository.ClubRepository;
-import com.schedulsharing.repository.MemberRepository;
+import com.schedulsharing.service.club.ClubService;
+import com.schedulsharing.service.member.MemberService;
+import com.schedulsharing.web.club.dto.ClubCreateRequest;
+import com.schedulsharing.domain.club.repository.ClubRepository;
+import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.web.member.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,10 +61,8 @@ class MemberServiceTest {
                 .imagePath(imagePath2)
                 .build();
         memberService.signup(signUpRequestDto2);
-        MemberSearchRequest memberSearchRequest = MemberSearchRequest.builder()
-                .email(email2)
-                .build();
-        MemberResponse result = memberService.getMemberByEmail(memberSearchRequest).getContent();
+
+        MemberResponse result = memberService.getMemberByEmail(email2).getContent();
         assertEquals(result.getEmail(), email2);
         assertEquals(result.getName(), name2);
         assertEquals(result.getImagePath(), imagePath2);
