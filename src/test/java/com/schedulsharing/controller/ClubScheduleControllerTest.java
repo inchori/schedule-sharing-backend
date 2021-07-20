@@ -1,19 +1,19 @@
 package com.schedulsharing.controller;
 
+import com.schedulsharing.domain.club.repository.ClubRepository;
+import com.schedulsharing.domain.member.Member;
+import com.schedulsharing.domain.member.repository.MemberRepository;
+import com.schedulsharing.domain.schedule.repository.clubSchedule.ClubScheduleRepository;
+import com.schedulsharing.service.club.ClubService;
+import com.schedulsharing.service.member.MemberService;
+import com.schedulsharing.service.schedule.ClubScheduleService;
 import com.schedulsharing.web.club.dto.ClubCreateRequest;
 import com.schedulsharing.web.club.dto.ClubCreateResponse;
+import com.schedulsharing.web.member.dto.LoginRequestDto;
+import com.schedulsharing.web.member.dto.SignUpRequestDto;
 import com.schedulsharing.web.schedule.club.dto.ClubScheduleCreateRequest;
 import com.schedulsharing.web.schedule.club.dto.ClubScheduleCreateResponse;
 import com.schedulsharing.web.schedule.club.dto.ClubScheduleUpdateRequest;
-import com.schedulsharing.web.member.dto.LoginRequestDto;
-import com.schedulsharing.web.member.dto.SignUpRequestDto;
-import com.schedulsharing.domain.member.Member;
-import com.schedulsharing.domain.club.repository.ClubRepository;
-import com.schedulsharing.domain.member.repository.MemberRepository;
-import com.schedulsharing.domain.schedule.repository.clubSchedule.ClubScheduleRepository;
-import com.schedulsharing.service.schedule.ClubScheduleService;
-import com.schedulsharing.service.club.ClubService;
-import com.schedulsharing.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,8 +28,6 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
@@ -38,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class ClubScheduleControllerTest extends ApiDocumentationTest{
+class ClubScheduleControllerTest extends ApiDocumentationTest {
     @Autowired
     private ClubRepository clubRepository;
     @Autowired
@@ -110,13 +108,6 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .andExpect(jsonPath("startMeetingDate").exists())
                 .andExpect(jsonPath("endMeetingDate").exists())
                 .andDo(document("clubSchedule-create",
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("clubSchedule-getOne").description("link to getOne"),
-                                linkWithRel("clubSchedule-update").description("link to update"),
-                                linkWithRel("clubSchedule-delete").description("link to delete"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header"),
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
@@ -136,12 +127,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                                 fieldWithPath("name").description("생성된 클럽스케줄의 이름 또는 제목"),
                                 fieldWithPath("contents").description("생성된 클럽스케줄의 내용"),
                                 fieldWithPath("startMeetingDate").description("생성된 클럽스케줄의 시작 날짜"),
-                                fieldWithPath("endMeetingDate").description("생성된 클럽스케줄의 끝나는 날짜"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.clubSchedule-getOne.href").description("link to getOne"),
-                                fieldWithPath("_links.clubSchedule-update.href").description("link to update"),
-                                fieldWithPath("_links.clubSchedule-delete.href").description("link to delete"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("endMeetingDate").description("생성된 클럽스케줄의 끝나는 날짜")
                         )
                 ));
     }
@@ -188,13 +174,6 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                         pathParameters(
                                 parameterWithName("id").description("조회할 클럽스케줄의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("clubSchedule-create").description("link to create"),
-                                linkWithRel("clubSchedule-update").description("link to update 작성자에 경우에만 보입니다."),
-                                linkWithRel("clubSchedule-delete").description("link to delete 작성자에 경우에만 보입니다."),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
@@ -208,12 +187,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                                 fieldWithPath("startMeetingDate").description("조회한 클럽스케줄의 시작 날짜"),
                                 fieldWithPath("endMeetingDate").description("조회한 클럽스케줄의 끝나는 날짜"),
                                 fieldWithPath("memberName").description("조회한 클럽스케줄을 작성한 사람의 이름"),
-                                fieldWithPath("memberEmail").description("조회한 클럽스케줄을 작성한 사람의 이메일"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.clubSchedule-create.href").description("link to create"),
-                                fieldWithPath("_links.clubSchedule-update.href").description("link to update 작성자에 경우에만 보입니다."),
-                                fieldWithPath("_links.clubSchedule-delete.href").description("link to delete 작성자에 경우에만 보입니다."),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("memberEmail").description("조회한 클럽스케줄을 작성한 사람의 이메일")
                         )
                 ));
     }
@@ -231,7 +205,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                     .endMeetingDate(LocalDateTime.of(2021, 3, 1, 0, 0).plusDays(i))
                     .clubId(clubCreateResponse.getClubId())
                     .build();
-            clubScheduleService.create(createRequest, member.getEmail()).getContent();
+            clubScheduleService.create(createRequest, member.getEmail());
         }
         for (int i = 0; i < 5; i++) {
             ClubScheduleCreateRequest createRequest = ClubScheduleCreateRequest.builder()
@@ -241,7 +215,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                     .endMeetingDate(LocalDateTime.of(2021, 3, 2, 0, 0).plusDays(i))
                     .clubId(clubCreateResponse.getClubId())
                     .build();
-            clubScheduleService.create(createRequest, member.getEmail()).getContent();
+            clubScheduleService.create(createRequest, member.getEmail());
         }
 
         for (int i = 0; i < 3; i++) {
@@ -252,29 +226,18 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                     .endMeetingDate(LocalDateTime.of(2021, 4, 1, 0, 0).plusDays(i))
                     .clubId(clubCreateResponse.getClubId())
                     .build();
-            clubScheduleService.create(createRequest, member.getEmail()).getContent();
+            clubScheduleService.create(createRequest, member.getEmail());
         }
 
         mvc.perform(RestDocumentationRequestBuilders.get("/api/clubSchedule/list/{clubId}", clubCreateResponse.getClubId())
                 .header(HttpHeaders.AUTHORIZATION, getBearToken())
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("yearMonth", String.valueOf(YearMonth.of(2021,3))))
+                .param("yearMonth", String.valueOf(YearMonth.of(2021, 3))))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.clubScheduleList[0].id").exists())
-                .andExpect(jsonPath("_embedded.clubScheduleList[0].name").exists())
-                .andExpect(jsonPath("_embedded.clubScheduleList[0].contents").exists())
-                .andExpect(jsonPath("_embedded.clubScheduleList[0].startMeetingDate").exists())
-                .andExpect(jsonPath("_embedded.clubScheduleList[0].endMeetingDate").exists())
-                .andExpect(jsonPath("_embedded.clubScheduleList[0].memberName").exists())
-                .andExpect(jsonPath("_embedded.clubScheduleList[0].memberEmail").exists())
                 .andDo(document("clubSchedule-list",
                         pathParameters(
                                 parameterWithName("clubId").description("클럽스케줄을 가져올 클럽 고유 아이디")
-                        ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
                         ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
@@ -286,19 +249,13 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type")
                         ),
                         responseFields(
-                                fieldWithPath("_embedded.clubScheduleList[0].id").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄의 고유아이디"),
-                                fieldWithPath("_embedded.clubScheduleList[0].name").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄의 이름"),
-                                fieldWithPath("_embedded.clubScheduleList[0].contents").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄의 내용"),
-                                fieldWithPath("_embedded.clubScheduleList[0].startMeetingDate").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄의 시작날짜"),
-                                fieldWithPath("_embedded.clubScheduleList[0].endMeetingDate").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄의 시작날짜"),
-                                fieldWithPath("_embedded.clubScheduleList[0].memberName").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄을 작성한 멤버의 이름"),
-                                fieldWithPath("_embedded.clubScheduleList[0].memberEmail").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄을 작성한 멤버의 이메일"),
-                                fieldWithPath("_embedded.clubScheduleList[0]._links.clubSchedule-create.href").description("link to create"),
-                                fieldWithPath("_embedded.clubScheduleList[0]._links.clubSchedule-getOne.href").description("link to getOne"),
-                                fieldWithPath("_embedded.clubScheduleList[0]._links.clubSchedule-update.href").description("link to update 작성자에 경우에만 보입니다."),
-                                fieldWithPath("_embedded.clubScheduleList[0]._links.clubSchedule-delete.href").description("link to delete 작성자에 경우에만 보입니다."),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("[].id").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄의 고유아이디"),
+                                fieldWithPath("[].name").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄의 이름"),
+                                fieldWithPath("[].contents").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄의 내용"),
+                                fieldWithPath("[].startMeetingDate").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄의 시작날짜"),
+                                fieldWithPath("[].endMeetingDate").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄의 시작날짜"),
+                                fieldWithPath("[].memberName").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄을 작성한 멤버의 이름"),
+                                fieldWithPath("[].memberEmail").description("조회한 클럽스케줄리스트중 첫번째 클럽스케줄을 작성한 멤버의 이메일")
                         )
                 ));
     }
@@ -329,13 +286,6 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                         pathParameters(
                                 parameterWithName("id").description("수정할 클럽스케줄의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("clubSchedule-create").description("link to create"),
-                                linkWithRel("clubSchedule-getOne").description("link to getOne"),
-                                linkWithRel("clubSchedule-delete").description("link to delete"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰"),
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
@@ -354,12 +304,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                                 fieldWithPath("name").description("수정한 클럽스케줄의 이름 또는 제목"),
                                 fieldWithPath("contents").description("수정한 클럽스케줄의 내용"),
                                 fieldWithPath("startMeetingDate").description("수정한 클럽스케줄의 시작 날짜"),
-                                fieldWithPath("endMeetingDate").description("수정한 클럽스케줄의 끝나는 날짜"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.clubSchedule-create.href").description("link to create"),
-                                fieldWithPath("_links.clubSchedule-getOne.href").description("link to getOne"),
-                                fieldWithPath("_links.clubSchedule-delete.href").description("link to delete"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("endMeetingDate").description("수정한 클럽스케줄의 끝나는 날짜")
                         )
                 ));
     }
@@ -398,11 +343,6 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                         pathParameters(
                                 parameterWithName("id").description("삭제할 클럽스케줄의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("clubSchedule-create").description("link to create"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
@@ -411,10 +351,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                         ),
                         responseFields(
                                 fieldWithPath("success").description("삭제를 성공했는 지"),
-                                fieldWithPath("message").description("삭제 성공 message"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.clubSchedule-create.href").description("link to create"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("message").description("삭제 성공 message")
                         )
                 ));
     }
@@ -475,7 +412,7 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .endMeetingDate(LocalDateTime.now())
                 .clubId(content.getClubId())
                 .build();
-        return clubScheduleService.create(createRequest, email).getContent();
+        return clubScheduleService.create(createRequest, email);
     }
 
     private ClubScheduleCreateResponse createClubScheduleByTest2() {
@@ -495,6 +432,6 @@ class ClubScheduleControllerTest extends ApiDocumentationTest{
                 .endMeetingDate(LocalDateTime.now())
                 .clubId(content.getClubId())
                 .build();
-        return clubScheduleService.create(createRequest, email).getContent();
+        return clubScheduleService.create(createRequest, email);
     }
 }

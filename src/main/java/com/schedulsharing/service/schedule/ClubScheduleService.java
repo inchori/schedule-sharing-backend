@@ -10,19 +10,15 @@ import com.schedulsharing.excpetion.PermissionException;
 import com.schedulsharing.service.club.exception.ClubNotFoundException;
 import com.schedulsharing.service.member.exception.MemberNotFoundException;
 import com.schedulsharing.service.schedule.exception.ClubScheduleNotFoundException;
-import com.schedulsharing.web.dto.resource.ClubScheduleResource;
 import com.schedulsharing.web.schedule.club.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.YearMonth;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,59 +31,52 @@ public class ClubScheduleService {
     private final ClubScheduleRepository clubScheduleRepository;
     private final ModelMapper modelMapper;
 
-    public EntityModel<ClubScheduleCreateResponse> create(ClubScheduleCreateRequest createRequest, String email) {
+    public ClubScheduleCreateResponse create(ClubScheduleCreateRequest createRequest, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         Club club = clubRepository.findById(createRequest.getClubId()).orElseThrow(ClubNotFoundException::new);
 
         ClubSchedule clubSchedule = ClubSchedule.createClubSchedule(createRequest, member, club);
         ClubSchedule savedClubSchedule = clubScheduleRepository.save(clubSchedule);
 
-        ClubScheduleCreateResponse createResponse = modelMapper.map(savedClubSchedule, ClubScheduleCreateResponse.class);
-
-        return ClubScheduleResource.createClubScheduleLink(createResponse);
+        return modelMapper.map(savedClubSchedule, ClubScheduleCreateResponse.class);
     }
 
     @Transactional(readOnly = true)
-    public EntityModel<ClubScheduleResponse> getClubSchedule(Long id, String email) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+    public ClubScheduleResponse getClubSchedule(Long id) {
         ClubSchedule clubSchedule = clubScheduleRepository.findById(id).orElseThrow(ClubScheduleNotFoundException::new);
-        ClubScheduleResponse response = modelMapper.map(clubSchedule, ClubScheduleResponse.class);
-        return ClubScheduleResource.getClubScheduleLink(response, member.getEmail());
+
+        return modelMapper.map(clubSchedule, ClubScheduleResponse.class);
     }
 
     @Transactional(readOnly = true)
-    public CollectionModel<EntityModel<ClubScheduleResponse>> getClubScheduleList(Long clubId, YearMonth yearMonth, String email) {
+    public List<ClubScheduleResponse> getClubScheduleList(Long clubId, YearMonth yearMonth) {
         List<ClubSchedule> clubSchedules = clubScheduleRepository.findAllByClubId(clubId, yearMonth);
-        List<ClubScheduleResponse> responseList = clubSchedules.stream()
+        return clubSchedules.stream()
                 .map(clubSchedule -> modelMapper.map(clubSchedule, ClubScheduleResponse.class))
                 .collect(Collectors.toList());
-
-        return ClubScheduleResource.getClubScheduleListLink(responseList, clubId, email);
     }
 
-    public EntityModel<ClubScheduleUpdateResponse> update(Long id, ClubScheduleUpdateRequest clubScheduleUpdateRequest, String email) {
+    public ClubScheduleUpdateResponse update(Long id, ClubScheduleUpdateRequest clubScheduleUpdateRequest, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         ClubSchedule clubSchedule = clubScheduleRepository.findById(id).orElseThrow(ClubScheduleNotFoundException::new);
         if (!member.equals(clubSchedule.getMember())) {
             throw new PermissionException();
         }
         clubSchedule.update(clubScheduleUpdateRequest);
-        ClubScheduleUpdateResponse response = modelMapper.map(clubSchedule, ClubScheduleUpdateResponse.class);
-        return ClubScheduleResource.updateClubScheduleLink(response);
+
+        return modelMapper.map(clubSchedule, ClubScheduleUpdateResponse.class);
     }
 
-    public EntityModel<ClubScheduleDeleteResponse> delete(Long id, String email) {
+    public ClubScheduleDeleteResponse delete(Long id, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         ClubSchedule clubSchedule = clubScheduleRepository.findById(id).orElseThrow(ClubScheduleNotFoundException::new);
         if (!member.equals(clubSchedule.getMember())) {
             throw new PermissionException();
         }
         clubScheduleRepository.deleteById(id);
-        ClubScheduleDeleteResponse clubScheduleDeleteResponse = ClubScheduleDeleteResponse.builder()
+        return ClubScheduleDeleteResponse.builder()
                 .message("클럽 스케줄을 삭제하였습니다.")
                 .success(true)
                 .build();
-
-        return ClubScheduleResource.deleteClubScheduleLink(id, clubScheduleDeleteResponse);
     }
 }

@@ -1,20 +1,16 @@
 package com.schedulsharing.web.schedule.club;
 
-import com.schedulsharing.web.schedule.club.dto.ClubScheduleCreateRequest;
-import com.schedulsharing.web.schedule.club.dto.ClubScheduleCreateResponse;
-import com.schedulsharing.web.schedule.club.dto.ClubScheduleUpdateRequest;
-import com.schedulsharing.web.dto.resource.ClubScheduleResource;
 import com.schedulsharing.service.schedule.ClubScheduleService;
+import com.schedulsharing.web.schedule.club.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.YearMonth;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,41 +19,28 @@ public class ClubScheduleController {
     private final ClubScheduleService clubScheduleService;
 
     @PostMapping
-    public ResponseEntity createClubSchedule(@RequestBody @Valid ClubScheduleCreateRequest createRequest,
-                                             Authentication authentication, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        EntityModel<ClubScheduleCreateResponse> entityModel = clubScheduleService.create(createRequest, authentication.getName());
-
-        return ResponseEntity.created(ClubScheduleResource.getCreatedUri(entityModel.getContent().getId())).body(entityModel);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ClubScheduleCreateResponse createClubSchedule(@RequestBody @Valid ClubScheduleCreateRequest createRequest, Authentication authentication) {
+        return clubScheduleService.create(createRequest, authentication.getName());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getClubSchedule(@PathVariable("id") Long id, Authentication authentication) {
-
-        return ResponseEntity.ok(clubScheduleService.getClubSchedule(id, authentication.getName()));
+    public ClubScheduleResponse getClubSchedule(@PathVariable("id") Long id) {
+        return clubScheduleService.getClubSchedule(id);
     }
 
     @GetMapping("/list/{clubId}")
-    public ResponseEntity getClubScheduleList(@PathVariable("clubId") Long clubId,
-                                              @RequestParam("yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth,
-                                              Authentication authentication) {
-        return ResponseEntity.ok(clubScheduleService.getClubScheduleList(clubId, yearMonth, authentication.getName()));
+    public List<ClubScheduleResponse> getClubScheduleList(@PathVariable("clubId") Long clubId, @RequestParam("yearMonth") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth) {
+        return clubScheduleService.getClubScheduleList(clubId, yearMonth);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity updateClubSchedule(@PathVariable("id") Long id,
-                                             @RequestBody @Valid ClubScheduleUpdateRequest clubScheduleUpdateRequest,
-                                             Authentication authentication) {
-
-        return ResponseEntity.ok(clubScheduleService.update(id, clubScheduleUpdateRequest, authentication.getName()));
+    public ClubScheduleUpdateResponse updateClubSchedule(@PathVariable("id") Long id, @RequestBody @Valid ClubScheduleUpdateRequest clubScheduleUpdateRequest, Authentication authentication) {
+        return clubScheduleService.update(id, clubScheduleUpdateRequest, authentication.getName());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteClubSchedule(@PathVariable("id") Long id, Authentication authentication) {
-
-        return ResponseEntity.ok(clubScheduleService.delete(id, authentication.getName()));
+    public ClubScheduleDeleteResponse deleteClubSchedule(@PathVariable("id") Long id, Authentication authentication) {
+        return clubScheduleService.delete(id, authentication.getName());
     }
 }
