@@ -71,7 +71,7 @@ class ScheduleSuggestionControllerTest extends ApiDocumentationTest {
                 .imagePath(imagePath)
                 .build();
 
-        memberService.signup(signUpRequestDto).getContent();
+        memberService.signup(signUpRequestDto);
         SignUpRequestDto signUpRequestDto2 = SignUpRequestDto.builder()
                 .email("test2@example.com")
                 .password("1234")

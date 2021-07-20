@@ -63,7 +63,7 @@ public class VoteServiceTest {
                 .imagePath(imagePath)
                 .build();
 
-        memberService.signup(signUpRequestDto).getContent();
+        memberService.signup(signUpRequestDto);
     }
 
     @DisplayName("투표 수정 테스트")

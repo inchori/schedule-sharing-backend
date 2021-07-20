@@ -1,9 +1,9 @@
 package com.schedulsharing.controller;
 
-import com.schedulsharing.web.member.dto.LoginRequestDto;
-import com.schedulsharing.web.member.dto.SignUpRequestDto;
 import com.schedulsharing.domain.member.repository.MemberRepository;
 import com.schedulsharing.service.member.MemberService;
+import com.schedulsharing.web.member.dto.LoginRequestDto;
+import com.schedulsharing.web.member.dto.SignUpRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-class AuthControllerTest extends ApiDocumentationTest{
+class AuthControllerTest extends ApiDocumentationTest {
     @Autowired
     private MemberService memberService;
     @Autowired
@@ -61,10 +59,6 @@ class AuthControllerTest extends ApiDocumentationTest{
                 .andExpect(jsonPath("imagePath").exists())
                 .andExpect(jsonPath("access_token").exists())
                 .andDo(document("member-login",
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
                         ),
@@ -80,16 +74,14 @@ class AuthControllerTest extends ApiDocumentationTest{
                                 fieldWithPath("name").description("로그인인 한 유저의 이름"),
                                 fieldWithPath("email").description("로그인인 한 유저의 이메일"),
                                 fieldWithPath("imagePath").description("로그인인 한 유저의 프로필파일"),
-                                fieldWithPath("access_token").description("로그인인 한 유저의 access_token"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("access_token").description("로그인인 한 유저의 access_token")
                         )
                 ));
     }
 
     @DisplayName("로그인 실패")
     @Test
-    public void 로그인실패() throws Exception{
+    public void 로그인실패() throws Exception {
         SignUpRequestDto signUpRequestDto = SignUpRequestDto.builder()
                 .email("test@example.com")
                 .name("tester")

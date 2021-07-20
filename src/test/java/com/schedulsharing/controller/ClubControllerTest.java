@@ -113,14 +113,14 @@ class ClubControllerTest extends ApiDocumentationTest {
                 .name("테스터2")
                 .imagePath("imagePath10")
                 .build();
-        SignUpResponseDto signUpResponseDto1 = memberService.signup(signUpRequestDto1).getContent();
+        SignUpResponseDto signUpResponseDto1 = memberService.signup(signUpRequestDto1);
         SignUpRequestDto signUpRequestDto2 = SignUpRequestDto.builder()
                 .email("test3@example.com")
                 .password("123456")
                 .name("테스터3")
                 .imagePath("imagePath101")
                 .build();
-        SignUpResponseDto signUpResponseDto2 = memberService.signup(signUpRequestDto2).getContent();
+        SignUpResponseDto signUpResponseDto2 = memberService.signup(signUpRequestDto2);
 
         Long member1Id = signUpResponseDto1.getId();
         Long member2Id = signUpResponseDto2.getId();
@@ -168,14 +168,14 @@ class ClubControllerTest extends ApiDocumentationTest {
                 .name("테스터2")
                 .imagePath("imagePath10")
                 .build();
-        SignUpResponseDto signUpResponseDto1 = memberService.signup(signUpRequestDto1).getContent();
+        SignUpResponseDto signUpResponseDto1 = memberService.signup(signUpRequestDto1);
         SignUpRequestDto signUpRequestDto2 = SignUpRequestDto.builder()
                 .email("test3@example.com")
                 .password("123456")
                 .name("테스터3")
                 .imagePath("imagePath101")
                 .build();
-        SignUpResponseDto signUpResponseDto2 = memberService.signup(signUpRequestDto2).getContent();
+        SignUpResponseDto signUpResponseDto2 = memberService.signup(signUpRequestDto2);
 
         Long member1Id = signUpResponseDto1.getId();
         Long member2Id = signUpResponseDto2.getId();
@@ -332,7 +332,7 @@ class ClubControllerTest extends ApiDocumentationTest {
                 .name("테스터2")
                 .imagePath("imagePath10")
                 .build();
-        memberService.signup(signUpRequestDto).getContent();
+        memberService.signup(signUpRequestDto);
 
         Long clubId = createClub("test2@example.com");
 

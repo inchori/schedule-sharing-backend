@@ -428,7 +428,7 @@ class ScheduleSuggestionServiceTest {
                 .imagePath(imagePath3)
                 .build();
 
-        SignUpResponseDto content = memberService.signup(signUpRequestDto3).getContent();
+        SignUpResponseDto content = memberService.signup(signUpRequestDto3);
         ClubCreateResponse clubCreateResponse = createClub(member, "testClubName", "밥");
 
         ClubInviteRequest clubInviteRequest = ClubInviteRequest.builder()

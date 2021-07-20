@@ -62,7 +62,7 @@ class MemberServiceTest {
                 .build();
         memberService.signup(signUpRequestDto2);
 
-        MemberResponse result = memberService.getMemberByEmail(email2).getContent();
+        MemberResponse result = memberService.getMemberByEmail(email2);
         assertEquals(result.getEmail(), email2);
         assertEquals(result.getName(), name2);
         assertEquals(result.getImagePath(), imagePath2);
@@ -94,7 +94,7 @@ class MemberServiceTest {
         createClub(email, "스터디 모임", "스터디");
         createClub(email2, "테스트2모임", "테스트2모임카테고리");
 
-        Collection<GetClubsResponse> result = memberService.getClubs(email).getContent();
+        Collection<GetClubsResponse> result = memberService.getClubs(email);
         assertEquals(result.size(), 2);
     }
 
@@ -110,9 +110,9 @@ class MemberServiceTest {
                 .password(password)
                 .imagePath(imagePath)
                 .build();
-        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto).getContent();
+        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto);
 
-        MemberResponse memberResponse = memberService.getMemberById(signUpResponseDto.getId()).getContent();
+        MemberResponse memberResponse = memberService.getMemberById(signUpResponseDto.getId());
 
         assertEquals(memberResponse.getId(), signUpResponseDto.getId());
         assertEquals(memberResponse.getEmail(), signUpResponseDto.getEmail());
@@ -132,7 +132,7 @@ class MemberServiceTest {
                 .password(password)
                 .imagePath(imagePath)
                 .build();
-        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto).getContent();
+        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto);
 
         String updateName = "수정된 멤버 이름";
         String updatePassword = "2345";
@@ -143,25 +143,24 @@ class MemberServiceTest {
                 .imagePath(updateImagePath)
                 .build();
 
-        MemberUpdateResponse updateResponse = memberService.updateMember(signUpResponseDto.getId(), updateRequest, signUpResponseDto.getEmail()).getContent();
+        MemberUpdateResponse updateResponse = memberService.updateMember(signUpResponseDto.getId(), updateRequest, signUpResponseDto.getEmail());
 
         assertEquals(updateResponse.getName(), updateName);
-//        assertEquals(updateResponse.getPassword(), passwordEncoder.encode(updatePassword));
         assertEquals(updateResponse.getImagePath(), updateImagePath);
     }
 
     @DisplayName("멤버 탈퇴 및 삭제 성공")
     @Test
-    public void 멤버_삭제_성공() throws Exception {
+    public void 멤버_삭제_성공() {
         SignUpRequestDto signUpRequestDto = SignUpRequestDto.builder()
                 .email("test@example.com")
                 .name("test")
                 .password("1234")
                 .imagePath("imagePath")
                 .build();
-        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto).getContent();
+        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto);
 
-        memberService.deleteMember(signUpResponseDto.getId(), signUpResponseDto.getEmail()).getContent();
+        memberService.deleteMember(signUpResponseDto.getId(), signUpResponseDto.getEmail());
 
         assertEquals(memberRepository.findById(signUpResponseDto.getId()).isEmpty(), true);
     }

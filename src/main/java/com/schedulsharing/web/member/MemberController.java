@@ -1,62 +1,58 @@
 package com.schedulsharing.web.member;
 
-import com.schedulsharing.web.member.dto.EmailCheckRequestDto;
-import com.schedulsharing.web.member.dto.MemberUpdateRequest;
-import com.schedulsharing.web.member.dto.SignUpRequestDto;
 import com.schedulsharing.service.member.MemberService;
+import com.schedulsharing.web.member.dto.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
-@Slf4j
 public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity signup(@RequestBody @Valid SignUpRequestDto signUpRequestDto) {
+    public SignUpResponseDto signup(@RequestBody @Valid SignUpRequestDto signUpRequestDto) {
 
-        return ResponseEntity.ok().body(memberService.signup(signUpRequestDto));
+        return memberService.signup(signUpRequestDto);
     }
 
     @PostMapping("/checkEmail")
-    public ResponseEntity existedEmailCheck(@RequestBody @Valid EmailCheckRequestDto emailCheckRequestDto) {
+    public EmailCheckResponseDto existedEmailCheck(@RequestBody @Valid EmailCheckRequestDto emailCheckRequestDto) {
 
-        return ResponseEntity.ok(memberService.emailCheck(emailCheckRequestDto.getEmail()));
+        return memberService.emailCheck(emailCheckRequestDto.getEmail());
     }
 
     @GetMapping("/getClubs")
-    public ResponseEntity getClubs(Authentication authentication) {
+    public List<GetClubsResponse> getClubs(Authentication authentication) {
 
-        return ResponseEntity.ok(memberService.getClubs(authentication.getName()));
+        return memberService.getClubs(authentication.getName());
     }
 
     @GetMapping("/search")
-    public ResponseEntity getMemberByEmail(@RequestParam("email") String email) {
+    public MemberResponse getMemberByEmail(@RequestParam("email") String email) {
 
-        return ResponseEntity.ok(memberService.getMemberByEmail(email));
+        return memberService.getMemberByEmail(email);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getMemberById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(memberService.getMemberById(id));
+    public MemberResponse getMemberById(@PathVariable("id") Long id) {
+        return memberService.getMemberById(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity updateMember(@PathVariable("id") Long id,
-                                       @RequestBody @Valid MemberUpdateRequest memberUpdateRequest,
-                                       Authentication authentication) {
-        return ResponseEntity.ok(memberService.updateMember(id, memberUpdateRequest, authentication.getName()));
+    public MemberUpdateResponse updateMember(@PathVariable("id") Long id,
+                                             @RequestBody @Valid MemberUpdateRequest memberUpdateRequest,
+                                             Authentication authentication) {
+        return memberService.updateMember(id, memberUpdateRequest, authentication.getName());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteMember(@PathVariable("id") Long id, Authentication authentication) {
-        return ResponseEntity.ok(memberService.deleteMember(id, authentication.getName()));
+    public MemberDeleteResponse deleteMember(@PathVariable("id") Long id, Authentication authentication) {
+        return memberService.deleteMember(id, authentication.getName());
     }
 }

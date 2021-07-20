@@ -1,9 +1,9 @@
 package com.schedulsharing.controller;
 
-import com.schedulsharing.web.club.dto.ClubCreateRequest;
 import com.schedulsharing.domain.member.repository.MemberRepository;
 import com.schedulsharing.service.club.ClubService;
 import com.schedulsharing.service.member.MemberService;
+import com.schedulsharing.web.club.dto.ClubCreateRequest;
 import com.schedulsharing.web.member.dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,8 +16,6 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
@@ -62,13 +60,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                 .andExpect(jsonPath("email").exists())
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("imagePath").exists())
-                .andExpect(jsonPath("_links.self.href").exists())
-                .andExpect(jsonPath("_links.profile.href").exists())
                 .andDo(document("member-signup",
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
                         ),
@@ -85,9 +77,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                                 fieldWithPath("id").description("회원가입한 멤버의 고유 아이디"),
                                 fieldWithPath("email").description("이메일"),
                                 fieldWithPath("name").description("애플리케이션에서 사용할 이름"),
-                                fieldWithPath("imagePath").description("프로필파일"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("imagePath").description("프로필파일")
                         )
                 ));
     }
@@ -137,10 +127,6 @@ class MemberControllerTest extends ApiDocumentationTest {
                 .andDo(print())
                 .andExpect(jsonPath("message").exists())
                 .andDo(document("member-checkEmail",
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
                         ),
@@ -152,9 +138,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                         ),
                         responseFields(
                                 fieldWithPath("duplicate").description("이메일이 중복되었다면 true 중복되지 않았다면 false"),
-                                fieldWithPath("message").description("이메일 중복 확인 메시지"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("message").description("이메일 중복 확인 메시지")
                         )
                 ));
     }
@@ -179,15 +163,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                 .header(HttpHeaders.AUTHORIZATION, getBearToken()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.clubList[0].clubId").exists())
-                .andExpect(jsonPath("_embedded.clubList[0].clubName").exists())
-                .andExpect(jsonPath("_embedded.clubList[0].categories").exists())
-                .andExpect(jsonPath("_embedded.clubList[0].leaderId").exists())
                 .andDo(document("member-getClubs",
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
@@ -195,12 +171,10 @@ class MemberControllerTest extends ApiDocumentationTest {
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type")
                         ),
                         responseFields(
-                                fieldWithPath("_embedded.clubList[0].clubId").description("클럽의 고유 아이디"),
-                                fieldWithPath("_embedded.clubList[0].clubName").description("클럽의 이름"),
-                                fieldWithPath("_embedded.clubList[0].categories").description("클럽의 카테고리"),
-                                fieldWithPath("_embedded.clubList[0].leaderId").description("클럽을 생성한 멤버의 고유아이디"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("[].clubId").description("클럽의 고유 아이디"),
+                                fieldWithPath("[].clubName").description("클럽의 이름"),
+                                fieldWithPath("[].categories").description("클럽의 카테고리"),
+                                fieldWithPath("[].leaderId").description("클럽을 생성한 멤버의 고유아이디")
                         )
                 ));
     }
@@ -235,10 +209,6 @@ class MemberControllerTest extends ApiDocumentationTest {
                 .andExpect(jsonPath("name").exists())
                 .andExpect(jsonPath("imagePath").exists())
                 .andDo(document("member-findByEmail",
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
@@ -252,9 +222,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                                 fieldWithPath("id").description("이메일검색 결과 나온 멤버의 고유 아이디"),
                                 fieldWithPath("email").description("이메일검색 결과 나온 멤버의 이메일"),
                                 fieldWithPath("name").description("이메일검색 결과 나온 멤버의 이름"),
-                                fieldWithPath("imagePath").description("이메일검색 결과 나온 멤버의 이미지 경로"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("imagePath").description("이메일검색 결과 나온 멤버의 이미지 경로")
                         )
                 ));
     }
@@ -308,7 +276,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                 .name("테스터")
                 .imagePath("imagePath")
                 .build();
-        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto).getContent();
+        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto);
         mvc.perform(RestDocumentationRequestBuilders.get("/api/member/{id}", signUpResponseDto.getId())
                 .header(HttpHeaders.AUTHORIZATION, getBearToken())
                 .contentType(MediaType.APPLICATION_JSON))
@@ -322,10 +290,6 @@ class MemberControllerTest extends ApiDocumentationTest {
                         pathParameters(
                                 parameterWithName("id").description("멤버의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
@@ -336,9 +300,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                                 fieldWithPath("id").description("멤버의 고유아이디"),
                                 fieldWithPath("email").description("멤버의 이메일 주소"),
                                 fieldWithPath("name").description("멤버의 이름"),
-                                fieldWithPath("imagePath").description("멤버의 프로필 사진 경로"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("imagePath").description("멤버의 프로필 사진 경로")
                         )
                 ));
     }
@@ -352,7 +314,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                 .password("1234")
                 .imagePath("imagePath")
                 .build();
-        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto).getContent();
+        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto);
         MemberUpdateRequest memberUpdateRequest = MemberUpdateRequest.builder()
                 .name("수정할 이름")
                 .password("수정할 비밀번호")
@@ -373,10 +335,6 @@ class MemberControllerTest extends ApiDocumentationTest {
                         pathParameters(
                                 parameterWithName("id").description("수정할 멤버의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰"),
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
@@ -393,9 +351,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                                 fieldWithPath("id").description("수정한 멤버의 고유아이디"),
                                 fieldWithPath("name").description("수정한 멤버의 이름"),
                                 fieldWithPath("email").description("멤버의 이메일"),
-                                fieldWithPath("imagePath").description("수정한 멤버의 프로필 사진 경로"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("imagePath").description("수정한 멤버의 프로필 사진 경로")
                         )
                 ));
 
@@ -411,7 +367,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                 .password("1234")
                 .imagePath("imagePath")
                 .build();
-        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto).getContent();
+        SignUpResponseDto signUpResponseDto = memberService.signup(signUpRequestDto);
 
         mvc.perform(RestDocumentationRequestBuilders.delete("/api/member/{id}", signUpResponseDto.getId())
                 .header(HttpHeaders.AUTHORIZATION, getBearToken()))
@@ -423,10 +379,6 @@ class MemberControllerTest extends ApiDocumentationTest {
                         pathParameters(
                                 parameterWithName("id").description("삭제할 멤버의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
@@ -435,9 +387,7 @@ class MemberControllerTest extends ApiDocumentationTest {
                         ),
                         responseFields(
                                 fieldWithPath("success").description("삭제를 성공했는 지"),
-                                fieldWithPath("message").description("삭제 성공 message"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("message").description("삭제 성공 message")
                         )
                 ));
 
