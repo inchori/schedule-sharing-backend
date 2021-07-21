@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.YearMonth;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,26 +29,24 @@ public class MyScheduleService {
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
-    public EntityModel<MyScheduleCreateResponse> create(MyScheduleCreateRequest myScheduleCreateRequest, String email) {
+    public MyScheduleCreateResponse create(MyScheduleCreateRequest myScheduleCreateRequest, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
         MySchedule mySchedule = MySchedule.createMySchedule(myScheduleCreateRequest, member);
         MySchedule savedMySchedule = myScheduleRepository.save(mySchedule);
-        MyScheduleCreateResponse myScheduleCreateResponse = modelMapper.map(savedMySchedule, MyScheduleCreateResponse.class);
 
-        return MyScheduleResource.createMyScheduleLink(myScheduleCreateResponse);
+        return modelMapper.map(savedMySchedule, MyScheduleCreateResponse.class);
     }
 
     @Transactional(readOnly = true)
-    public EntityModel<MyScheduleResponse> getMySchedule(Long myScheduleId, String email) {
+    public MyScheduleResponse getMySchedule(Long myScheduleId, String email) {
         MySchedule mySchedule = myScheduleRepository.findById(myScheduleId).orElseThrow(MyScheduleNotFoundException::new);
-        MyScheduleResponse myScheduleResponse = modelMapper.map(mySchedule, MyScheduleResponse.class);
 
-        return MyScheduleResource.getMyScheduleLink(myScheduleResponse);
+        return modelMapper.map(mySchedule, MyScheduleResponse.class);
     }
 
     @Transactional(readOnly = true)
-    public CollectionModel<EntityModel<MyScheduleResponse>> getMyScheduleList(YearMonth yearMonth, String email) {
+    public Collection<MyScheduleResponse> getMyScheduleList(YearMonth yearMonth, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         List<MySchedule> myScheduleList = myScheduleRepository.findAllByEmail(member.getEmail(), yearMonth);
         for (MySchedule mySchedule : myScheduleList) {
@@ -58,31 +57,26 @@ public class MyScheduleService {
         List<MyScheduleResponse> myScheduleResponseList = myScheduleList.stream()
                 .map(mySchedule -> modelMapper.map(mySchedule, MyScheduleResponse.class))
                 .collect(Collectors.toList());
-        return MyScheduleResource.getMyScheduleListLink(myScheduleResponseList, member.getEmail());
+        return myScheduleResponseList;
     }
 
-    public EntityModel<MyScheduleUpdateResponse> update(Long myScheduleId, MyScheduleUpdateRequest updateRequest, String email) {
+    public MyScheduleUpdateResponse update(Long myScheduleId, MyScheduleUpdateRequest updateRequest, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         MySchedule mySchedule = myScheduleRepository.findById(myScheduleId).orElseThrow(MyScheduleNotFoundException::new);
         if (!member.equals(mySchedule.getMember())) {
             throw new PermissionException();
         }
         mySchedule.update(updateRequest);
-        MyScheduleUpdateResponse myScheduleUpdateResponse = modelMapper.map(mySchedule, MyScheduleUpdateResponse.class);
-        return MyScheduleResource.updateMyScheduleLink(myScheduleUpdateResponse);
+        return modelMapper.map(mySchedule, MyScheduleUpdateResponse.class);
     }
 
-    public EntityModel<MyScheduleDeleteResponse> delete(Long myScheduleId, String email) {
+    public MyScheduleDeleteResponse delete(Long myScheduleId, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         MySchedule mySchedule = myScheduleRepository.findById(myScheduleId).orElseThrow(MyScheduleNotFoundException::new);
         if (!member.equals(mySchedule.getMember())) {
             throw new PermissionException();
         }
         myScheduleRepository.deleteById(myScheduleId);
-        MyScheduleDeleteResponse myScheduleDeleteResponse = MyScheduleDeleteResponse.builder()
-                .message("나의 스케줄을 삭제하였습니다.")
-                .success(true)
-                .build();
-        return MyScheduleResource.deleteMyScheduleLink(myScheduleId, myScheduleDeleteResponse);
+        return new MyScheduleDeleteResponse(true, "나의 스케줄을 삭제하였습니다.");
     }
 }
