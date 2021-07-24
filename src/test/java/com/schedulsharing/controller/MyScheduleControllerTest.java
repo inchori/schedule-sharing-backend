@@ -84,7 +84,6 @@ class MyScheduleControllerTest extends ApiDocumentationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createRequest)))
                 .andDo(print())
-                .andExpect(status().isCreated())
                 .andExpect(jsonPath("name").value("나 스케줄 생성 테스트"))
                 .andExpect(jsonPath("contents").value("스터디 모임"))
                 .andExpect(jsonPath("scheduleStartDate").exists())
@@ -188,11 +187,6 @@ class MyScheduleControllerTest extends ApiDocumentationTest {
                 .param("yearMonth", String.valueOf(YearMonth.of(2021, 3))))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("myScheduleResponseList[0].myScheduleId").exists())
-                .andExpect(jsonPath("myScheduleResponseList[0].name").exists())
-                .andExpect(jsonPath("myScheduleResponseList[0].contents").exists())
-                .andExpect(jsonPath("myScheduleResponseList[0].startDate").exists())
-                .andExpect(jsonPath("myScheduleResponseList[0].endDate").exists())
                 .andDo(document("mySchedule-list",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
@@ -204,11 +198,11 @@ class MyScheduleControllerTest extends ApiDocumentationTest {
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type")
                         ),
                         responseFields(
-                                fieldWithPath("myScheduleResponseList[0].myScheduleId").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 고유아이디"),
-                                fieldWithPath("myScheduleResponseList[0].name").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 이름"),
-                                fieldWithPath("myScheduleResponseList[0].contents").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 내용"),
-                                fieldWithPath("myScheduleResponseList[0].startDate").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 시작날짜"),
-                                fieldWithPath("myScheduleResponseList[0].endDate").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 종날짜")
+                                fieldWithPath("[].myScheduleId").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 고유아이디"),
+                                fieldWithPath("[].name").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 이름"),
+                                fieldWithPath("[].contents").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 내용"),
+                                fieldWithPath("[].startDate").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 시작날짜"),
+                                fieldWithPath("[].endDate").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 종날짜")
                         )
                 ));
     }

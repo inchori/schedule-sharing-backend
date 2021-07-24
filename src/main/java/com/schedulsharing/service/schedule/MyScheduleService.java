@@ -46,7 +46,7 @@ public class MyScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public Collection<MyScheduleResponse> getMyScheduleList(YearMonth yearMonth, String email) {
+    public List<MyScheduleResponse> getMyScheduleList(YearMonth yearMonth, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         List<MySchedule> myScheduleList = myScheduleRepository.findAllByEmail(member.getEmail(), yearMonth);
         for (MySchedule mySchedule : myScheduleList) {
@@ -54,10 +54,9 @@ public class MyScheduleService {
                 throw new PermissionException();
             }
         }
-        List<MyScheduleResponse> myScheduleResponseList = myScheduleList.stream()
+        return myScheduleList.stream()
                 .map(mySchedule -> modelMapper.map(mySchedule, MyScheduleResponse.class))
                 .collect(Collectors.toList());
-        return myScheduleResponseList;
     }
 
     public MyScheduleUpdateResponse update(Long myScheduleId, MyScheduleUpdateRequest updateRequest, String email) {
