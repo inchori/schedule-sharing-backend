@@ -24,15 +24,13 @@ public class VoteService {
     private final VoteCheckRepository voteCheckRepository;
     private final ModelMapper modelMapper;
 
-    public EntityModel<SuggestionVoteUpdateResponse> updateVote(Long id, SuggestionVoteUpdateRequest updateRequest, String email) {
+    public SuggestionVoteUpdateResponse updateVote(Long id, SuggestionVoteUpdateRequest updateRequest, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
         VoteCheck voteCheck = voteCheckRepository.findById(id).orElseThrow(VoteNotFoundException::new);
         if (!voteCheck.getMember().equals(member)) {
             throw new PermissionException();
         }
         voteCheck.update(updateRequest);
-        SuggestionVoteUpdateResponse voteUpdateResponse = modelMapper.map(voteCheck, SuggestionVoteUpdateResponse.class);
-
-        return SuggestionResource.updateVoteLink(voteUpdateResponse);
+        return modelMapper.map(voteCheck, SuggestionVoteUpdateResponse.class);
     }
 }

@@ -109,11 +109,6 @@ public class VoteControllerTest extends ApiDocumentationTest{
                         pathParameters(
                                 parameterWithName("voteId").description("수정할 투표의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("suggestion-vote").description("link to suggestion-vote"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type"),
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
@@ -126,10 +121,7 @@ public class VoteControllerTest extends ApiDocumentationTest{
                         ),
                         responseFields(
                                 fieldWithPath("id").description("수정된 투표의 고유아이디"),
-                                fieldWithPath("agree").description("수정된 투표 찬반"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.suggestion-vote.href").description("link to suggestion-vote"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("agree").description("수정된 투표 찬반")
                         )
                 ));
     }

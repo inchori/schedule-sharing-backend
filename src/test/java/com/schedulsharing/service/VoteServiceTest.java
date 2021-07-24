@@ -27,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 public class VoteServiceTest {
@@ -93,8 +94,8 @@ public class VoteServiceTest {
                 .agree(false)
                 .build();
 
-        SuggestionVoteUpdateResponse updateResponse = voteService.updateVote(content.getId(), updateRequest, "test@example.com").getContent();
-        assertEquals(updateResponse.isAgree(), false);
+        SuggestionVoteUpdateResponse updateResponse = voteService.updateVote(content.getId(), updateRequest, "test@example.com");
+        assertFalse(updateResponse.isAgree());
     }
 
     private ClubCreateResponse createClub(Member savedMember, String clubName, String categories) {
