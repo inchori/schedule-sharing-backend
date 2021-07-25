@@ -16,6 +16,7 @@ import org.springframework.hateoas.EntityModel;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,7 +53,7 @@ public class MyScheduleServiceTest {
                 .scheduleEndDate(endDate)
                 .build();
         //when
-        MyScheduleCreateResponse result = myScheduleService.create(createRequest, member.getEmail()).getContent();
+        MyScheduleCreateResponse result = myScheduleService.create(createRequest, member.getEmail());
         //then
         assertEquals(result.getName(), myScheduleName);
         assertEquals(result.getContents(), myScheduleContents);
@@ -77,10 +78,10 @@ public class MyScheduleServiceTest {
                 .scheduleEndDate(endDate)
                 .build();
 
-        MyScheduleCreateResponse createResponse = myScheduleService.create(createRequest, member.getEmail()).getContent();
+        MyScheduleCreateResponse createResponse = myScheduleService.create(createRequest, member.getEmail());
 
         Long myScheduleId = createResponse.getMyScheduleId();
-        MyScheduleResponse result = myScheduleService.getMySchedule(myScheduleId, "test@example.com").getContent();
+        MyScheduleResponse result = myScheduleService.getMySchedule(myScheduleId, "test@example.com");
         assertEquals(result.getName(), name);
         assertEquals(result.getContents(), contents);
     }
@@ -96,7 +97,7 @@ public class MyScheduleServiceTest {
                     .scheduleStartDate(LocalDateTime.of(2021, 2, 15, 0, 0).plusDays(i))
                     .scheduleEndDate(LocalDateTime.of(2021, 3, 1, 0, 0).plusDays(i))
                     .build();
-            myScheduleService.create(createRequest, member.getEmail()).getContent();
+            myScheduleService.create(createRequest, member.getEmail());
         }
 
         for (int i = 0; i < 20; i++) {
@@ -106,7 +107,7 @@ public class MyScheduleServiceTest {
                     .scheduleStartDate(LocalDateTime.of(2021, 3, 1, 0, 0).plusDays(i))
                     .scheduleEndDate(LocalDateTime.of(2021, 3, 1, 0, 0).plusDays(i))
                     .build();
-            myScheduleService.create(createRequest, member.getEmail()).getContent();
+            myScheduleService.create(createRequest, member.getEmail());
         }
 
         for (int i = 0; i < 10; i++) {
@@ -116,11 +117,11 @@ public class MyScheduleServiceTest {
                     .scheduleStartDate(LocalDateTime.of(2021, 4, 1, 0, 0).plusDays(i))
                     .scheduleEndDate(LocalDateTime.of(2021, 4, 1, 0, 0).plusDays(i))
                     .build();
-            myScheduleService.create(createRequest, member.getEmail()).getContent();
+            myScheduleService.create(createRequest, member.getEmail());
         }
 
         YearMonth yearMonth = YearMonth.of(2021,3);
-        Collection<EntityModel<MyScheduleResponse>> myScheduleList = myScheduleService.getMyScheduleList(yearMonth, member.getEmail()).getContent();
+        Collection<MyScheduleResponse> myScheduleList = myScheduleService.getMyScheduleList(yearMonth, member.getEmail());
         //3월시작 3월끝 = 30개
         assertEquals(myScheduleList.size(), 30);
     }
@@ -140,7 +141,7 @@ public class MyScheduleServiceTest {
                 .scheduleEndDate(endDate)
                 .build();
 
-        MyScheduleCreateResponse createResponse = myScheduleService.create(createRequest, member.getEmail()).getContent();
+        MyScheduleCreateResponse createResponse = myScheduleService.create(createRequest, member.getEmail());
         String updateName = "수정된 나의 스케줄 이름";
         String updateContents = "수정된 나의 스케줄 내용";
         LocalDateTime updateStartDate = LocalDateTime.now().plusDays(1);
@@ -153,7 +154,7 @@ public class MyScheduleServiceTest {
                 .scheduleEndDate(updateEndDate)
                 .build();
 
-        MyScheduleUpdateResponse updateResponse = myScheduleService.update(createResponse.getMyScheduleId(), updateRequest, member.getEmail()).getContent();
+        MyScheduleUpdateResponse updateResponse = myScheduleService.update(createResponse.getMyScheduleId(), updateRequest, member.getEmail());
 
         assertEquals(updateResponse.getName(), updateName);
         assertEquals(updateResponse.getContents(), updateContents);
@@ -177,7 +178,7 @@ public class MyScheduleServiceTest {
                 .scheduleEndDate(endDate)
                 .build();
 
-        MyScheduleCreateResponse createResponse = myScheduleService.create(createRequest, member.getEmail()).getContent();
+        MyScheduleCreateResponse createResponse = myScheduleService.create(createRequest, member.getEmail());
 
         myScheduleService.delete(createResponse.getMyScheduleId(), member.getEmail());
 

@@ -1,15 +1,15 @@
 package com.schedulsharing.controller;
 
-import com.schedulsharing.web.schedule.my.dto.MyScheduleCreateRequest;
-import com.schedulsharing.web.schedule.my.dto.MyScheduleCreateResponse;
-import com.schedulsharing.web.schedule.my.dto.MyScheduleUpdateRequest;
-import com.schedulsharing.web.member.dto.LoginRequestDto;
-import com.schedulsharing.web.member.dto.SignUpRequestDto;
 import com.schedulsharing.domain.member.Member;
 import com.schedulsharing.domain.member.repository.MemberRepository;
 import com.schedulsharing.domain.schedule.repository.myschedule.MyScheduleRepository;
 import com.schedulsharing.service.member.MemberService;
 import com.schedulsharing.service.schedule.MyScheduleService;
+import com.schedulsharing.web.member.dto.LoginRequestDto;
+import com.schedulsharing.web.member.dto.SignUpRequestDto;
+import com.schedulsharing.web.schedule.my.dto.MyScheduleCreateRequest;
+import com.schedulsharing.web.schedule.my.dto.MyScheduleCreateResponse;
+import com.schedulsharing.web.schedule.my.dto.MyScheduleUpdateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,8 +24,6 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
@@ -35,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-public class MyScheduleControllerTest extends ApiDocumentationTest {
+class MyScheduleControllerTest extends ApiDocumentationTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
@@ -86,19 +84,11 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createRequest)))
                 .andDo(print())
-                .andExpect(status().isCreated())
                 .andExpect(jsonPath("name").value("나 스케줄 생성 테스트"))
                 .andExpect(jsonPath("contents").value("스터디 모임"))
                 .andExpect(jsonPath("scheduleStartDate").exists())
                 .andExpect(jsonPath("scheduleEndDate").exists())
                 .andDo(document("mySchedule-create",
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("mySchedule-getOne").description("link to getOne"),
-                                linkWithRel("mySchedule-update").description("link to update"),
-                                linkWithRel("mySchedule-delete").description("link to delete"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header"),
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
@@ -117,12 +107,7 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                                 fieldWithPath("name").description("생성된 나의 스케줄의 이름 또는 제목"),
                                 fieldWithPath("contents").description("생성된 나의 스케줄의 내용"),
                                 fieldWithPath("scheduleStartDate").description("생성된 나의 스케줄의 시작 날짜"),
-                                fieldWithPath("scheduleEndDate").description("생성된 나의 스케줄의 끝나는 날짜"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.mySchedule-getOne.href").description("link to getOne"),
-                                fieldWithPath("_links.mySchedule-update.href").description("link to update"),
-                                fieldWithPath("_links.mySchedule-delete.href").description("link to delete"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("scheduleEndDate").description("생성된 나의 스케줄의 끝나는 날짜")
                         )
                 ));
 
@@ -147,13 +132,6 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                         pathParameters(
                                 parameterWithName("id").description("내 스케줄의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("mySchedule-create").description("link to create"),
-                                linkWithRel("mySchedule-update").description("link to update"),
-                                linkWithRel("mySchedule-delete").description("link to delete"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
@@ -165,12 +143,7 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                                 fieldWithPath("name").description("조회한 나의 스케줄의 이름 또는 제목"),
                                 fieldWithPath("contents").description("조회한 나의 스케줄의 내용"),
                                 fieldWithPath("startDate").description("조회한 나의 스케줄의 시작 날짜"),
-                                fieldWithPath("endDate").description("조회한 나의 스케줄의 끝나는 날짜"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.mySchedule-create.href").description("link to create"),
-                                fieldWithPath("_links.mySchedule-update.href").description("link to update"),
-                                fieldWithPath("_links.mySchedule-delete.href").description("link to delete"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("endDate").description("조회한 나의 스케줄의 끝나는 날짜")
                         )
                 ));
     }
@@ -186,7 +159,7 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                     .scheduleStartDate(LocalDateTime.of(2021, 2, 15, 0, 0).plusDays(i))
                     .scheduleEndDate(LocalDateTime.of(2021, 3, 1, 0, 0).plusDays(i))
                     .build();
-            myScheduleService.create(createRequest, member.getEmail()).getContent();
+            myScheduleService.create(createRequest, member.getEmail());
         }
 
         for (int i = 0; i < 5; i++) {
@@ -196,7 +169,7 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                     .scheduleStartDate(LocalDateTime.of(2021, 3, 1, 0, 0).plusDays(i))
                     .scheduleEndDate(LocalDateTime.of(2021, 3, 2, 0, 0).plusDays(i))
                     .build();
-            myScheduleService.create(createRequest, member.getEmail()).getContent();
+            myScheduleService.create(createRequest, member.getEmail());
         }
 
         for (int i = 0; i < 3; i++) {
@@ -206,7 +179,7 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                     .scheduleStartDate(LocalDateTime.of(2021, 4, 1, 0, 0).plusDays(i))
                     .scheduleEndDate(LocalDateTime.of(2021, 4, 1, 0, 0).plusDays(i))
                     .build();
-            myScheduleService.create(createRequest, member.getEmail()).getContent();
+            myScheduleService.create(createRequest, member.getEmail());
         }
 
         mvc.perform(RestDocumentationRequestBuilders.get("/api/myschedule/list")
@@ -214,16 +187,7 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                 .param("yearMonth", String.valueOf(YearMonth.of(2021, 3))))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.myScheduleResponseList[0].myScheduleId").exists())
-                .andExpect(jsonPath("_embedded.myScheduleResponseList[0].name").exists())
-                .andExpect(jsonPath("_embedded.myScheduleResponseList[0].contents").exists())
-                .andExpect(jsonPath("_embedded.myScheduleResponseList[0].startDate").exists())
-                .andExpect(jsonPath("_embedded.myScheduleResponseList[0].endDate").exists())
                 .andDo(document("mySchedule-list",
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
@@ -234,17 +198,11 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Content type")
                         ),
                         responseFields(
-                                fieldWithPath("_embedded.myScheduleResponseList[0].myScheduleId").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 고유아이디"),
-                                fieldWithPath("_embedded.myScheduleResponseList[0].name").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 이름"),
-                                fieldWithPath("_embedded.myScheduleResponseList[0].contents").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 내용"),
-                                fieldWithPath("_embedded.myScheduleResponseList[0].startDate").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 시작날짜"),
-                                fieldWithPath("_embedded.myScheduleResponseList[0].endDate").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 종날짜"),
-                                fieldWithPath("_embedded.myScheduleResponseList[0]._links.mySchedule-create.href").description("link to create"),
-                                fieldWithPath("_embedded.myScheduleResponseList[0]._links.mySchedule-getOne.href").description("link to getOne"),
-                                fieldWithPath("_embedded.myScheduleResponseList[0]._links.mySchedule-update.href").description("link to update 작성자에 경우에만 보입니다."),
-                                fieldWithPath("_embedded.myScheduleResponseList[0]._links.mySchedule-delete.href").description("link to delete 작성자에 경우에만 보입니다."),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("[].myScheduleId").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 고유아이디"),
+                                fieldWithPath("[].name").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 이름"),
+                                fieldWithPath("[].contents").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 내용"),
+                                fieldWithPath("[].startDate").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 시작날짜"),
+                                fieldWithPath("[].endDate").description("조회한 나의 스케줄리스트중 첫번째 스케줄의 종날짜")
                         )
                 ));
     }
@@ -275,13 +233,6 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                         pathParameters(
                                 parameterWithName("id").description("수정할 나의 스케줄의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("mySchedule-create").description("link to create"),
-                                linkWithRel("mySchedule-getOne").description("link to getOne"),
-                                linkWithRel("mySchedule-delete").description("link to delete"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰"),
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
@@ -300,12 +251,7 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                                 fieldWithPath("name").description("수정한 나의 스케줄의 이름 또는 제목"),
                                 fieldWithPath("contents").description("수정한 나의 스케줄의 내용"),
                                 fieldWithPath("scheduleStartDate").description("수정한 나의 스케줄의 시작 날짜"),
-                                fieldWithPath("scheduleEndDate").description("수정한 나의 스케줄의 끝나는 날짜"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.mySchedule-create.href").description("link to create"),
-                                fieldWithPath("_links.mySchedule-getOne.href").description("link to getOne"),
-                                fieldWithPath("_links.mySchedule-delete.href").description("link to delete"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("scheduleEndDate").description("수정한 나의 스케줄의 끝나는 날짜")
                         )
                 ));
 
@@ -325,11 +271,6 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                         pathParameters(
                                 parameterWithName("id").description("삭제할 나의 스케줄의 고유 아이디")
                         ),
-                        links(
-                                linkWithRel("self").description("link to self"),
-                                linkWithRel("mySchedule-create").description("link to create"),
-                                linkWithRel("profile").description("link to profile")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("로그인한 유저의 토큰")
                         ),
@@ -338,10 +279,7 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                         ),
                         responseFields(
                                 fieldWithPath("success").description("삭제를 성공했는 지"),
-                                fieldWithPath("message").description("삭제 성공 message"),
-                                fieldWithPath("_links.self.href").description("link to self"),
-                                fieldWithPath("_links.mySchedule-create.href").description("link to create"),
-                                fieldWithPath("_links.profile.href").description("link to profile")
+                                fieldWithPath("message").description("삭제 성공 message")
                         )
                 ));
 
@@ -361,7 +299,7 @@ public class MyScheduleControllerTest extends ApiDocumentationTest {
                 .scheduleEndDate(scheduleEndDate)
                 .build();
 
-        return myScheduleService.create(createRequest, email).getContent();
+        return myScheduleService.create(createRequest, email);
     }
 
 
