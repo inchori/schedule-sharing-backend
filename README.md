@@ -1,5 +1,5 @@
 # Schedule Sharing Backend
-Schedule Sharing RESTful API based on Spring, Spring Boot, JPA Hibernate ORM with MySQL, QueryDSL, Spring HATEOAS, Spring REST DOCS, JWT, AWS EC2
+Schedule Sharing RESTful API based on Spring Boot, JPA Hibernate ORM with MySQL, QueryDSL, ~~Spring HATEOAS~~, Spring REST DOCS, JWT, AWS EC2
 
 ## Requirements
 
